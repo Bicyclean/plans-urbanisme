@@ -47,13 +47,6 @@ Chaque vue a un texte d’aide en français expliquant ce que le service instruc
 
 Aucun compte, aucune donnée envoyée à un serveur de l’auteur. **Seule la vue Situation** contacte des services publics depuis votre navigateur : géocodage de l’adresse, tuiles de carte et API cadastre de la **Géoplateforme de l’IGN**. L’adresse que vous tapez et la zone affichée leur sont donc transmises. Vos projets restent dans le stockage local de votre navigateur et dans les fichiers que vous enregistrez.
 
-## Points à vérifier / limites connues
-
-- La couche **cadastre** (style « PCI vecteur » des tuiles WMTS de la Géoplateforme, avec repli sur le style normal) et l’appel **API Carto** pour trouver la parcelle ont été écrits d’après la documentation mais **n’ont pas pu être testés en conditions réelles** (accès réseau bloqué lors du développement). Si la parcelle ne s’affiche pas, dessinez-la à la main ou importez un fond cadastral.
-- Les règles de « Mon dossier » et les seuils (5 / 20 / 40 / 150 m², hauteur 12 m…) sont des **repères généraux** qui peuvent évoluer.
-- Pas de mode hors ligne, pas de traduction (choix assumé : outil en ligne, entièrement en français).
-- Pas d’outils d’alignement ni de groupes d’objets.
-- Le DXF exporté a été validé avec la bibliothèque `ezdxf` ; non testé dans AutoCAD ou LibreCAD.
 
 ## Développement
 
