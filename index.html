@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Plans pour dossier d’urbanisme – éditeur libre</title>
+<script>(function(){var t=null;try{t=localStorage.getItem('plan-de-masse-libre-v1-theme')}catch(e){}if(t!=='dark'&&t!=='light')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})();</script>
 <style id="pageStyle"></style>
 <style>
 :root{--bg:#eef0f3;--panel:#fff;--line:#d5d9e0;--ink:#1f2430;--muted:#6b7280;--accent:#2563eb}
@@ -31,7 +32,9 @@ button:disabled{opacity:.4;cursor:default}
 .tools{padding:6px 10px;background:var(--panel);border-bottom:1px solid var(--line)}
 .tools select{padding:5px 7px;border:1px solid var(--line);border-radius:6px;background:#fff;max-width:200px}
 .stageBox{flex:1;min-height:0;position:relative;background:#cfd3da;overflow:hidden}
-#stage{position:absolute;inset:0;width:100%;height:100%;touch-action:none;user-select:none;display:block;font-family:Arial,Helvetica,sans-serif}
+#stage,#ovl{position:absolute;inset:0;width:100%;height:100%;display:block;font-family:Arial,Helvetica,sans-serif}
+#stage{touch-action:none;user-select:none}
+#ovl{pointer-events:none;will-change:transform}
 .status{display:flex;justify-content:space-between;gap:12px;padding:4px 10px;background:var(--panel);border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
 #toast{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);background:#111827;color:#fff;padding:8px 14px;border-radius:8px;font-size:13px;max-width:90%;opacity:0;pointer-events:none;transition:opacity .2s}
 #toast.show{opacity:.95}
@@ -62,8 +65,10 @@ details ul{margin:6px 0 0;padding-left:18px}
 details li{margin:3px 0;font-size:13px}
 kbd{background:#f3f4f6;border:1px solid var(--line);border-radius:4px;padding:0 4px;font-size:12px}
 @media (max-width:900px){
-  .work{flex-direction:column}
-  .side{width:auto;max-height:46vh;border-left:0;border-top:1px solid var(--line)}
+  html,body{height:auto}
+  .work{flex:none;flex-direction:column}
+  .canvasWrap{flex:none;height:72vh;height:72svh;min-height:320px}
+  .side{width:auto;max-height:none;border-left:0;border-top:1px solid var(--line)}
 }
 button.accent{background:#fff7ed;border-color:#fdba74;color:#9a3412;font-weight:600}
 button.accent:hover{background:#ffedd5}
@@ -87,8 +92,53 @@ table.pcs td:first-child{white-space:nowrap;font-weight:600;width:70px}
 .mapres button{display:block;width:100%;text-align:left;margin:3px 0}
 #dlgBody .row>label{flex:0 1 270px}
 #dlgBody .row.check>label{flex:1}
-@media (max-width:600px){#dlgBody .row{flex-wrap:wrap}#dlgBody .row>label{flex:1 1 100%}}
+#dlgBody>div:first-child>button{align-self:flex-start}
+@media (max-width:600px){.brand span{display:none}header.top{padding:6px 8px}#dlgBody .row{flex-wrap:wrap}#dlgBody .row>label{flex:1 1 100%}}
 #modes button{padding:5px 11px}
+/* ---- mode sombre : seule l'interface change, la feuille reste blanche comme le papier ---- */
+:root{color-scheme:light}
+dialog{background:var(--panel)}
+@media screen{
+html[data-theme=dark]{color-scheme:dark;--bg:#14171d;--panel:#1d2129;--line:#363c48;--ink:#e6e8ec;--muted:#9aa3b2;--accent:#3b82f6}
+html[data-theme=dark] button,html[data-theme=dark] .tools select,html[data-theme=dark] .card,html[data-theme=dark] .row input[type=text],html[data-theme=dark] .row input[type=number],html[data-theme=dark] .row select,html[data-theme=dark] .row input[type=color],html[data-theme=dark] table.vtx input,html[data-theme=dark] #dlgBody input,html[data-theme=dark] #dlgBody select{background:#232833;color:var(--ink)}
+html[data-theme=dark] button:hover,html[data-theme=dark] kbd{background:#2c3340}
+html[data-theme=dark] button.primary,html[data-theme=dark] .modes button.on{background:var(--accent);color:#fff}
+html[data-theme=dark] button.primary:hover{background:#2563eb}
+html[data-theme=dark] button.on{background:#1e3a5f;border-color:#3b82f6}
+html[data-theme=dark] button.danger{color:#f87171}
+html[data-theme=dark] button.accent{background:#3b2414;border-color:#9a3412;color:#fdba74}
+html[data-theme=dark] button.accent:hover{background:#4a2c16}
+html[data-theme=dark] .stageBox{background:#0d0f13}
+html[data-theme=dark] #toast{background:#e6e8ec;color:#111827}
+html[data-theme=dark] #drawBar{background:rgba(29,33,41,.95)}
+html[data-theme=dark] .warn{background:#3a2e0b;border-color:#8a6d1a}
+html[data-theme=dark] .ok,html[data-theme=dark] .res.dp{background:#0f2e22;border-color:#1f6f4f}
+html[data-theme=dark] .res.pc{background:#14243d;border-color:#2f5a96}
+html[data-theme=dark] .res.no{background:#262b35;border-color:#454c5a}
+html[data-theme=dark] table.sum td,html[data-theme=dark] table.pcs td{border-bottom-color:#2c323d}
+html[data-theme=dark] .tag.o{background:#3f1515;border-color:#7f1d1d;color:#fca5a5}
+html[data-theme=dark] .tag.c{background:#3a2e0b;border-color:#8a6d1a;color:#fcd34d}
+html[data-theme=dark] .tag.ok{background:#0f2e22;border-color:#1f6f4f;color:#86efac}
+html[data-theme=dark] .pl.ko{color:#f87171}
+html[data-theme=dark] .pl.good{color:#4ade80}
+html[data-theme=dark] dialog::backdrop{background:rgba(0,0,0,.6)}
+}
+#tour{position:fixed;inset:0;z-index:60}
+#tourHole{position:fixed;border-radius:8px;box-shadow:0 0 0 9999px rgba(15,23,42,.55);transition:all .25s;pointer-events:none}
+#tourHole.none{box-shadow:0 0 0 9999px rgba(15,23,42,.55);width:0;height:0}
+#tourBox{position:fixed;width:340px;max-width:calc(100% - 24px);background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+#tourBox h3{margin:2px 0 6px;font-size:16px}
+#tourText{font-size:13.5px;line-height:1.45}
+#tourText p{margin:0 0 6px}
+.tourNav{display:flex;gap:6px;margin-top:10px}.tourNav span{flex:1}
+@media (max-width:600px){#tourBox{left:12px!important;right:12px;bottom:12px;top:auto!important;width:auto}}
+#saveNag{position:fixed;right:16px;bottom:16px;z-index:40;max-width:380px;background:var(--panel);color:var(--ink);border:1px solid #f59e0b;border-left:5px solid #f59e0b;border-radius:10px;padding:10px 12px;box-shadow:0 6px 24px rgba(0,0,0,.25);font-size:13px}
+#saveNag div{display:flex;gap:6px;margin-top:8px;justify-content:flex-end}
+.prj{display:flex;gap:10px;align-items:center;padding:9px 4px;border-bottom:1px solid var(--line)}
+.prj .pi{flex:1;min-width:0}.prj .pi b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prj .pa{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.prj.cur{background:rgba(37,99,235,.07)}
+@media (max-width:600px){.prj{flex-direction:column;align-items:stretch}.prj .pa{justify-content:flex-start}}
 #printRoot{display:none}
 @media print{
   html,body{height:auto;margin:0;background:#fff;display:block}
@@ -112,12 +162,14 @@ table.pcs td:first-child{white-space:nowrap;font-weight:600;width:70px}
     <button data-mode="insertion" title="Insertion dans l’environnement, sur photo (DP6 / PCMI6)">Insertion</button>
   </div>
   <div class="actions">
+    <button id="bTour" title="Visite guidée de l’outil">?</button>
     <button id="bDossier" class="accent" title="Quel dossier déposer, liste des pièces, PDF complet">Mon dossier</button>
     <span class="sep"></span>
-    <button id="bNew">Nouveau</button>
-    <button id="bOpen">Ouvrir…</button>
+    <button id="bProjects" title="Reprendre, dupliquer ou supprimer vos dossiers">Mes dossiers</button>
+    <button id="bNew" title="Commencer un nouveau dossier (les autres restent dans « Mes dossiers »)">Nouveau</button>
+    <button id="bOpen" title="Ouvrir une copie de dossier (.json)">Ouvrir…</button>
     <input type="file" id="fileIn" accept=".json,application/json" hidden>
-    <button id="bSave">Enregistrer (.json)</button>
+    <button id="bSave" title="Télécharger une copie de ce dossier (.json), images comprises">Enregistrer une copie</button>
     <span class="sep"></span>
     <button id="bUndo" title="Annuler (Ctrl+Z)">↶</button>
     <button id="bRedo" title="Rétablir (Ctrl+Y)">↷</button>
@@ -128,6 +180,8 @@ table.pcs td:first-child{white-space:nowrap;font-weight:600;width:70px}
     <button id="bDXF" title="Géométrie en mètres, échelle 1:1, un calque par type">DXF</button>
     <button id="bDXFin" title="Importer un plan DXF (lignes, polylignes, cercles, textes, cotes) dans la vue courante">Importer DXF</button>
     <input type="file" id="dxfIn" accept=".dxf" hidden>
+    <span class="sep"></span>
+    <button id="bTheme" title="Basculer entre mode clair et mode sombre">☾</button>
   </div>
 </header>
 
@@ -163,9 +217,9 @@ table.pcs td:first-child{white-space:nowrap;font-weight:600;width:70px}
           <g id="bgLayer"></g>
           <g id="mapLayer"></g>
           <g id="sheet"></g>
-          <g id="overlay" pointer-events="none"></g>
         </g>
       </svg>
+      <svg id="ovl" aria-hidden="true"><g id="ovlView"><g id="overlay"></g></g></svg>
       <div id="drawBar" hidden><button id="dbOk" class="primary">✔ Terminer</button><button id="dbUndo">↩ Dernier point</button><button id="dbCancel">✕ Abandonner</button></div>
       <div id="toast"></div>
     </div>
@@ -180,7 +234,7 @@ table.pcs td:first-child{white-space:nowrap;font-weight:600;width:70px}
       </details>
     </div>
 
-    <div class="card">
+    <div class="card" id="cardSheet">
       <h3>Feuille et échelle</h3>
       <div class="row"><label for="fFormat">Format</label>
         <select id="fFormat"><option value="A4">A4</option><option value="A3">A3</option></select></div>
@@ -213,7 +267,7 @@ table.pcs td:first-child{white-space:nowrap;font-weight:600;width:70px}
       <input type="file" id="bgFile" accept="image/*" hidden>
     </div>
 
-    <div class="card">
+    <div class="card" id="cardSel">
       <h3>Objet sélectionné</h3>
       <div id="objPanel"></div>
     </div>
@@ -234,7 +288,7 @@ table.pcs td:first-child{white-space:nowrap;font-weight:600;width:70px}
       </details>
     </div>
 
-    <div class="card">
+    <div class="card" id="cardCart">
       <h3>Cartouche</h3>
       <div class="row"><label for="cPiece">Pièce</label><select id="cPiece"></select></div>
       <div class="row"><label for="cProjet">Projet</label><input type="text" id="cProjet" maxlength="120"></div>
@@ -247,20 +301,20 @@ table.pcs td:first-child{white-space:nowrap;font-weight:600;width:70px}
 
     <div class="card">
       <details>
-        <summary>Aide rapide</summary>
+        <summary>Raccourcis et astuces</summary>
         <ul>
-          <li><b>Trois vues</b> : « Plan de masse », « Façades » et « Coupe ». Chaque vue a sa propre feuille, mais le cartouche (projet, adresse…) est commun.</li>
-          <li><b>Polygone</b> : cliquez les sommets, double-clic (ou <kbd>Entrée</kbd>) pour terminer, <kbd>Retour</kbd> pour annuler le dernier point, <kbd>Échap</kbd> pour abandonner. Les types « ligne » (clôture, haie, terrain naturel…) ne se referment pas.</li>
-          <li><b>Rectangle</b> : glissez. Pour une fenêtre, une porte ou un portail, un simple clic la place aux dimensions courantes ; réglez ensuite la taille et l’allège dans « Objet sélectionné ».</li>
-          <li><b>Façades</b> : l’assistant crée murs, toiture et sol. Choisissez le matériau de chaque élément. Les altitudes sont comptées à partir du sol (0).</li>
-          <li><b>Coupe</b> : dessinez le terrain naturel (ligne), puis le bâtiment ; le bilan donne la hauteur au-dessus du terrain naturel.</li>
-          <li><b>Fond de plan</b> : importez une image, cliquez deux points dont vous connaissez la distance, saisissez-la : l’image est mise à l’échelle. Calquez ensuite vos objets.</li>
-          <li><b>Fenêtres et portes (plan de masse)</b> : choisissez « Fenêtre (sur mur) » ou « Porte (sur mur) », outil Polygone, puis cliquez sur le mur d’une construction. Réglez largeur, position et sens du battant dans « Objet sélectionné ».</li>
-          <li><b>Symboles</b> : arbres, voitures, personnes, clôtures, haies, portails.</li>
-          <li><b>Vue</b> : molette pour zoomer, barre d’espace ou outil Main pour déplacer.</li>
-          <li><b>PDF</b> : dans la fenêtre d’impression, choisissez « Enregistrer au format PDF », marges « Aucune », échelle 100 %.</li>
-          <li><b>DXF</b> : géométrie de la vue courante en mètres (1 unité = 1 m), un calque par type d’objet, textes sans accents.</li>
-          <li>Le projet est enregistré automatiquement dans ce navigateur. « Enregistrer (.json) » en garde une copie complète, images comprises.</li>
+          <li><b>Polygone</b> : un clic par sommet ; double-clic ou <kbd>Entrée</kbd> pour terminer, <kbd>Retour</kbd> retire le dernier point, <kbd>Échap</kbd> abandonne. Les lignes (clôture, haie, terrain naturel…) restent ouvertes.</li>
+          <li><b>Rectangle</b> : glissez. En façade, un simple clic pose un élément (fenêtre, porte, lucarne, portail…) à ses dimensions courantes.</li>
+          <li><b>Fenêtres et portes sur un mur</b> (plan de masse, niveaux) : choisissez « Fenêtre (sur mur) » ou « Porte (sur mur) », puis cliquez sur le mur.</li>
+          <li><b>Modifier</b> : double-clic sur un côté pour ajouter un sommet, glissez un sommet pour le déplacer, <kbd>Suppr</kbd> pour effacer, flèches pour décaler (<kbd>Maj</kbd> : ×10).</li>
+          <li><b>Copier / coller</b> : <kbd>Ctrl+C</kbd> / <kbd>Ctrl+V</kbd>, aussi d’une vue à l’autre (un mur d’un niveau à l’autre, par exemple).</li>
+          <li><b>Annuler / rétablir</b> : <kbd>Ctrl+Z</kbd> / <kbd>Ctrl+Y</kbd>.</li>
+          <li><b>Outils au clavier</b> : <kbd>V</kbd> sélection, <kbd>H</kbd> main, <kbd>P</kbd> polygone, <kbd>R</kbd> rectangle, <kbd>C</kbd> cote, <kbd>T</kbd> texte, <kbd>N</kbd> niveau, <kbd>S</kbd> symbole.</li>
+          <li><b>Vue</b> : molette pour zoomer, barre d’espace ou outil Main pour déplacer ; sur tablette, deux doigts.</li>
+          <li><b>Fond de plan</b> : importez une image, « Mettre à l’échelle », cliquez deux points dont vous connaissez la distance et saisissez-la.</li>
+          <li><b>PDF</b> : dans la fenêtre d’impression, « Enregistrer au format PDF », marges « Aucune », échelle 100 %.</li>
+          <li><b>DXF</b> : export en mètres (1 unité = 1 m), un calque par type, textes sans accents ; import des lignes, polylignes, cercles, textes et cotes.</li>
+          <li><b>Sauvegarde</b> : automatique dans ce navigateur ; « Enregistrer une copie » télécharge le dossier complet (.json, images comprises).</li>
         </ul>
         <p class="small muted">Cet outil aide à préparer les plans. Il ne garantit pas la conformité du dossier : vérifiez les pièces exigées auprès du service urbanisme de votre mairie.</p>
       </details>
@@ -268,6 +322,8 @@ table.pcs td:first-child{white-space:nowrap;font-weight:600;width:70px}
   </aside>
 </div>
 
+<div id="tour" hidden><div id="tourHole"></div><div id="tourBox" role="dialog" aria-live="polite"><div id="tourStep" class="small muted"></div><h3 id="tourTitle"></h3><div id="tourText"></div><div class="tourNav"><button id="tourSkip">Passer</button><span></span><button id="tourPrev">Précédent</button><button id="tourNext" class="primary">Suivant</button></div></div></div>
+<div id="saveNag" hidden role="status"><span>Votre dossier n’est enregistré que dans ce navigateur. Gardez-en une copie : si l’historique est effacé, il serait perdu.</span><div><button id="nagSave" class="primary">Enregistrer une copie</button><button id="nagLater">Plus tard</button></div></div>
 <dialog id="dlg"><div id="dlgBody"></div></dialog>
 <div id="printRoot"></div>
 
@@ -285,7 +341,15 @@ const FORMATS = { A4: [210, 297], A3: [297, 420] };
 const ALL_SCALES = [20, 50, 100, 200, 250, 500, 1000, 2000, 5000, 10000, 25000];
 const SCALES_FOR = { masse: [20, 50, 100, 200, 250, 500, 1000, 2000], facade: [20, 50, 100, 200, 250, 500, 1000, 2000], coupe: [20, 50, 100, 200, 250, 500, 1000, 2000],
   niveau: [20, 50, 100, 200], situation: [2000, 5000, 10000, 25000], insertion: [1000] };
-const BAND = 38;            // hauteur de la bande basse (légende, cartouche), en mm
+const BAND = 38;            // hauteur minimale de la bande basse (légende, cartouche), en mm
+// mise en page de la légende : colonnes selon la largeur disponible, bande agrandie si besoin
+function legendLayout() {
+  const fr = frame(), lw = fr.w - 104, items = legendItems(), n = items.length;
+  const cols = n <= 6 ? 1 : Math.max(2, Math.min(4, Math.floor(lw / 42))), rows = Math.ceil(n / cols) || 1;
+  const rowH = rows > 6 ? 4.3 : 4.8;
+  return { items, cols, rows, rowH, lw, band: Math.max(BAND, 8.5 + rows * rowH + 1.5) };
+}
+const bandH = () => legendLayout().band;
 const KEY = 'plan-de-masse-libre-v1';
 
 const LEVELS = [['ss', 'Sous-sol'], ['rdc', 'Rez-de-chaussée'], ['e1', 'Étage 1'], ['e2', 'Étage 2'], ['cb', 'Combles']];
@@ -345,7 +409,7 @@ const TYPES = {
   acces: { label: 'Accès au terrain (flèche)', open: true, special: 'acces', stroke: '#c2410c', sw: 0.6, order: 5.2, name: '', dxf: 'ACCES', aci: 30 },
   r_eau: { label: 'Réseau d’eau potable', open: true, stroke: '#1d4ed8', sw: 0.5, dash: '4 1.2', order: 5.1, name: '', dxf: 'RESEAU_EAU', aci: 5, lt: 'DASHED' },
   r_elec: { label: 'Réseau électrique', open: true, stroke: '#dc2626', sw: 0.5, dash: '4 1.2', order: 5.1, name: '', dxf: 'RESEAU_ELEC', aci: 1, lt: 'DASHED' },
-  r_eu: { label: 'Eaux usées (assainissement)', open: true, stroke: '#7c2d12', sw: 0.5, dash: '4 1.2 1 1.2', order: 5.1, name: '', dxf: 'RESEAU_EU', aci: 30, lt: 'DASHDOT' },
+  r_eu: { label: 'Eaux usées', open: true, stroke: '#7c2d12', sw: 0.5, dash: '4 1.2 1 1.2', order: 5.1, name: '', dxf: 'RESEAU_EU', aci: 30, lt: 'DASHDOT' },
   r_ep: { label: 'Eaux pluviales', open: true, stroke: '#0e7490', sw: 0.5, dash: '1.5 1.2', order: 5.1, name: '', dxf: 'RESEAU_EP', aci: 4, lt: 'DASHED' },
   fenetre_p: { label: 'Fenêtre (sur mur)', open: true, special: 'fenetre_p', leg: '#dbeafe', stroke: '#111111', sw: 0.3, order: 5.6, name: '', max: 2, def: 1.2, dxf: 'FENETRE', aci: 5 },
   porte_p: { label: 'Porte (sur mur)', open: true, special: 'porte_p', leg: '#ffffff', stroke: '#111111', sw: 0.3, order: 5.6, name: '', max: 2, def: 0.9, dxf: 'PORTE', aci: 30 },
@@ -420,8 +484,7 @@ const HINTS = {
   texte: 'Cliquez à l’endroit où placer le texte.',
   sym: 'Cliquez pour placer le symbole choisi.',
   calib: 'Cliquez deux points de l’image dont vous connaissez la distance réelle.',
-  bgmove: 'Glissez pour déplacer l’image de fond.',
-  wallN: 'Cliquez sur un mur : la fenêtre ou la porte se place à cet endroit.'
+  bgmove: 'Glissez pour déplacer l’image de fond.'
 };
 
 const DEFAULT_CART = { piece: '', projet: '', adresse: '', commune: '', parcelle: '', auteur: '', date: '' };
@@ -434,7 +497,7 @@ const defPlu = () => ({ recVoie: null, recLim: null, empMax: null, hMax: null })
    ================================================================ */
 const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
 const r3 = n => Math.round(n * 1000) / 1000;
-const f2 = n => (Object.is(Math.round(n * 100) / 100, -0) ? 0 : n).toFixed(2).replace('.', ',');
+const f2 = n => { const [i, d] = (Object.is(Math.round(n * 100) / 100, -0) ? 0 : n).toFixed(2).split('.'); return i.replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0') + ',' + d; };
 const fnum = n => String(Math.round(n * 100) / 100).replace('.', ',');
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const trunc = (s, n) => { s = String(s || ''); return s.length > n ? s.slice(0, n - 1) + '…' : s; };
@@ -779,7 +842,7 @@ function usedImageIds() {
    ================================================================ */
 const sheetSize = () => { const f = FORMATS[S.format]; return S.orient === 'landscape' ? [f[1], f[0]] : [f[0], f[1]]; };
 function frame() { const [W, H] = sheetSize(), m = 7; return { x: m, y: m, w: W - 2 * m, h: H - 2 * m }; }
-function drawArea() { const f = frame(); return { x: f.x + 2, y: f.y + 2, w: f.w - 4, h: f.h - BAND - 4 }; }
+function drawArea() { const f = frame(); return { x: f.x + 2, y: f.y + 2, w: f.w - 4, h: f.h - bandH() - 4 }; }
 const K = () => 1000 / S.scale;                      // mm de papier par mètre réel
 const toP = p => [S.ox + p[0] * K(), S.oy - p[1] * K()];
 const toW = p => [(p[0] - S.ox) / K(), (S.oy - p[1]) / K()];
@@ -1244,13 +1307,22 @@ function scaleBarMarkup() {
 }
 function legendItems() {
   const items = [];
+  const byType = new Map();                                   // un seul passage sur les objets
+  let hasCote = false;
+  for (const o of S.objs) {
+    if (o.type === 'cote') { hasCote = true; continue; }
+    const T = TYPES[o.type];
+    if (!T) continue;
+    let e = byType.get(o.type);
+    if (!e) byType.set(o.type, e = new Map());
+    const m = T.mat ? (o.mat || T.defMat) : '';
+    if (!e.has(m)) e.set(m, o);
+  }
   for (const t of MODE_TYPES[S.mode]) {
-    const T = TYPES[t], objs = S.objs.filter(o => o.type === t);
-    if (!objs.length) continue;
+    const T = TYPES[t], e = byType.get(t);
+    if (!e) continue;
     if (T.mat) {
-      const used = [...new Set(objs.map(o => o.mat || T.defMat))];
-      for (const m of used) {
-        const first = objs.find(o => (o.mat || T.defMat) === m);
+      for (const [m, first] of e) {
         items.push({ label: MATS[m].label + (t === 'toit' ? ' (toiture)' : ' (façade)'), fill: m === 'enduit' ? (first.color || MATS.enduit.base) : 'pat:' + m, stroke: T.stroke, sw: T.sw });
       }
     } else if ((T.open && !T.leg) || (T.fill === 'none' && !T.pat)) {
@@ -1259,16 +1331,16 @@ function legendItems() {
       items.push({ label: T.label, fill: T.leg || fillToken({ type: t }), stroke: T.stroke, sw: T.sw, dash: T.dash, op: T.ins ? T.iop : undefined });
     }
   }
-  if (S.objs.some(o => o.type === 'cote')) items.push({ label: 'Cote (en mètres)', cote: true });
+  if (hasCote) items.push({ label: 'Cote (en mètres)', cote: true });
   return items;
 }
 function legendMarkup(pre) {
-  const fr = frame(), x0 = fr.x + 3, y0 = fr.y + fr.h - BAND + 3, lw = fr.w - 104;
-  const items = legendItems();
+  const L = legendLayout(), fr = frame(), x0 = fr.x + 3, y0 = fr.y + fr.h - L.band + 3, lw = L.lw;
+  const items = L.items;
   let s = txt(x0, y0 + 1.5, 0, 'LÉGENDE', 2.6, { anchor: 'start', halo: false, weight: 'bold' });
-  const cols = items.length > 6 || lw >= 150 ? 2 : 1, perCol = Math.ceil(items.length / cols) || 1, colW = lw / cols, maxChars = Math.floor((colW - 14) / 1.35);
+  const cols = L.cols, perCol = L.rows, colW = lw / cols, maxChars = Math.floor((colW - 12) / 1.3);
   items.forEach((it, i) => {
-    const c = Math.floor(i / perCol), r = i % perCol, x = x0 + c * colW, y = y0 + 5.5 + r * 4.8;
+    const c = Math.floor(i / perCol), r = i % perCol, x = x0 + c * colW, y = y0 + 5.5 + r * L.rowH;
     if (it.cote) {
       s += `<line x1="${x}" y1="${y + 2}" x2="${x + 8}" y2="${y + 2}" stroke="#111" stroke-width="0.25"/><line x1="${x}" y1="${y + 0.5}" x2="${x}" y2="${y + 3.5}" stroke="#111" stroke-width="0.25"/><line x1="${x + 8}" y1="${y + 0.5}" x2="${x + 8}" y2="${y + 3.5}" stroke="#111" stroke-width="0.25"/>`;
     } else if (it.line) {
@@ -1312,7 +1384,8 @@ function sheetMarkup(pre, exporting) {
     (exporting ? `<clipPath id="${pre}clip"><rect x="${da.x}" y="${da.y}" width="${da.w}" height="${da.h}"/></clipPath>` : '') + `</defs>`;
   if (exporting) s += `<rect width="${W}" height="${H}" fill="#fff"/>` + `<g clip-path="url(#${pre}clip)">${bgExportMarkup()}</g>` + mapExportMarkup(pre);
   s += `<rect x="${fr.x}" y="${fr.y}" width="${fr.w}" height="${fr.h}" fill="none" stroke="#000" stroke-width="0.5"/>`;
-  s += `<line x1="${fr.x}" y1="${fr.y + fr.h - BAND}" x2="${fr.x + fr.w}" y2="${fr.y + fr.h - BAND}" stroke="#000" stroke-width="0.35"/>`;
+  const bh = bandH();
+  s += `<line x1="${fr.x}" y1="${fr.y + fr.h - bh}" x2="${fr.x + fr.w}" y2="${fr.y + fr.h - bh}" stroke="#000" stroke-width="0.35"/>`;
   const list = S.objs.map((o, i) => [o, i]).sort((a, b) => ord(a[0]) - ord(b[0]) || a[1] - b[1]).map(x => x[0]);
   s += `<g${exporting ? ` clip-path="url(#${pre}clip)"` : ''}>`;
   for (const o of list) {
@@ -1345,9 +1418,12 @@ function svgDocument(pre) {
 /* ================================================================
    Rendu écran : feuille + surcouche d'édition
    ================================================================ */
-const stage = $('stage');
+const stage = $('stage'), stageBox = $('stageBox');
 let bgEl = null, bgSrcId = null;
-function applyView() { $('viewport').setAttribute('transform', `translate(${r3(view.tx)} ${r3(view.ty)}) scale(${view.k})`); }
+function applyView() {
+  const t = `translate(${r3(view.tx)} ${r3(view.ty)}) scale(${view.k})`;
+  $('viewport').setAttribute('transform', t); $('ovlView').setAttribute('transform', t);
+}
 function fitView() {
   const box = $('stageBox'), cw = box.clientWidth, ch = box.clientHeight;
   if (!cw || !ch) return;
@@ -1363,7 +1439,7 @@ function zoomAt(f, cx, cy) {
   view.tx = cx - (cx - view.tx) * (nk / view.k);
   view.ty = cy - (cy - view.ty) * (nk / view.k);
   view.k = nk; view.auto = false;
-  applyView(); render();
+  applyView(); renderOverlay();
 }
 function updateBg() {
   const b = S.bg, src = b && IMAGES[b.img];
@@ -1385,6 +1461,12 @@ function overlayMarkup() {
   const px = 1 / view.k, da = drawArea();
   let s = `<rect x="${da.x}" y="${da.y}" width="${da.w}" height="${da.h}" fill="none" stroke="#93c5fd" stroke-width="${r3(px)}" stroke-dasharray="${r3(5 * px)} ${r3(4 * px)}"/>`;
   const dash = `stroke-dasharray="${r3(5 * px)} ${r3(3 * px)}"`;
+  const g = ui.drag && ui.drag.ghost && ui.drag.o;
+  if (g) {
+    const inner = g.pts ? polyShape(g, 's-') : g.type === 'sym' ? primsMarkup(symPrims(g), 's-') : g.type === 'cote' ? coteMarkup(g) : g.type === 'niveau' ? niveauMarkup(g)
+      : txt(toP(g.p)[0], toP(g.p)[1], 0, g.text, g.size || 3.2, {});
+    s += `<g opacity="0.8">${inner}</g>`;
+  }
   if (tool === 'bgmove' && S.bg) {
     const b = S.bg, c = toP([b.cx, b.cy]), pw = b.w * K(), ph = b.w * b.ar * K();
     s += `<rect x="${r3(c[0] - pw / 2)}" y="${r3(c[1] - ph / 2)}" width="${r3(pw)}" height="${r3(ph)}" fill="none" stroke="#f97316" stroke-width="${r3(2 * px)}" ${dash} transform="rotate(${b.rot} ${r3(c[0])} ${r3(c[1])})"/>`;
@@ -1438,8 +1520,11 @@ function overlayMarkup() {
   }
   return s;
 }
-function render() {
-  const [W, H] = sheetSize();
+let rafR = 0, lastRenderMs = 0;
+function renderSoon() { if (!rafR) rafR = requestAnimationFrame(() => { rafR = 0; render(true); }); }
+function render(light) {
+  if (rafR) { cancelAnimationFrame(rafR); rafR = 0; }
+  const t0 = performance.now(), [W, H] = sheetSize();
   const sh = $('shadow'), pg = $('page');
   sh.setAttribute('x', 1.5); sh.setAttribute('y', 1.5); sh.setAttribute('width', W); sh.setAttribute('height', H);
   pg.setAttribute('x', 0); pg.setAttribute('y', 0); pg.setAttribute('width', W); pg.setAttribute('height', H);
@@ -1447,7 +1532,8 @@ function render() {
   updateMap();
   $('sheet').innerHTML = sheetMarkup('s-', false);
   $('overlay').innerHTML = overlayMarkup();
-  renderSummary();
+  if (!light) renderSummary();
+  lastRenderMs = performance.now() - t0;
 }
 function renderOverlay() {
   $('overlay').innerHTML = overlayMarkup();
@@ -2056,7 +2142,7 @@ function facadesFromPlan(src, P) {
     const exW = bb ? bb.maxx - bb.minx : 0, exH = bb ? bb.maxy - bb.miny : 0, scs = scalesFor('facade');
     const plan = sc => {
       const g = Math.max(3, 0.03 * sc), gy = hmax + Math.max(3.5, 0.03 * sc), maxW = da.w * 0.94 * sc / 1000;
-      let rowW = 0, rowN = 0, rows = [], cur = [];
+      let rowW = 0, rows = [], cur = [];
       for (const e of list) {
         if (cur.length && rowW + g + e.L > maxW) { rows.push(cur); cur = []; rowW = 0; }
         rowW += (cur.length ? g : 0) + e.L; cur.push(e);
@@ -2313,15 +2399,154 @@ function placeBackground(src, w, h) {
    Historique et sauvegarde
    ================================================================ */
 let saveTimer = null;
+/* Plusieurs dossiers dans le navigateur : un index (nom, date…) + un enregistrement par dossier.
+   Les images de fond sont stockées à part (KEY-img-id) et partagées. */
+let PROJ = [], curPid = null, lastEdit = 0, quotaWarned = false;
+const PKEY = id => KEY + '-p-' + id;
+const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } };
+const lsDel = k => { try { localStorage.removeItem(k); } catch (e) { /* ignore */ } };
+const newPid = () => 'p' + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36);
+function loadIndex() {
+  let l = null;
+  try { l = JSON.parse(lsGet(KEY + '-projects')); } catch (e) { l = null; }
+  PROJ = Array.isArray(l) ? l.filter(e => e && typeof e.id === 'string' && /^p[a-z0-9]{4,30}$/.test(e.id)) : [];
+}
+const saveIndex = () => lsSet(KEY + '-projects', JSON.stringify(PROJ));
+function projEntry() {
+  let e = PROJ.find(x => x.id === curPid);
+  if (!e) { e = { id: curPid, exp: 0, work: 0, snooze: 0 }; PROJ.unshift(e); }
+  return e;
+}
+function saveNow() {
+  clearTimeout(saveTimer); saveTimer = null;
+  if (!curPid) return;
+  const str = JSON.stringify(S);
+  let ok = lsSet(PKEY(curPid), str);
+  for (const id of usedImageIds()) if (ok && IMAGES[id] && !storedImgs.has(id)) { if (lsSet(KEY + '-img-' + id, IMAGES[id])) storedImgs.add(id); else ok = false; }
+  const e = projEntry(), now = Date.now();
+  Object.assign(e, { name: (S.cart.projet || '').trim().slice(0, 80), sub: (S.cart.commune || S.cart.adresse || '').trim().slice(0, 80), upd: now, size: str.length });
+  if (lastEdit && now - lastEdit < 5 * 60e3) e.work = (e.work || 0) + (now - lastEdit);
+  lastEdit = now;
+  ok = saveIndex() && ok; lsSet(KEY + '-cur', curPid);
+  if (!ok && !quotaWarned) { quotaWarned = true; toast('Stockage du navigateur plein : enregistrez une copie (.json) de votre dossier, et supprimez d’anciens dossiers ou fonds de plan.'); }
+  checkNag();
+}
+function checkNag() {
+  const e = PROJ.find(x => x.id === curPid), nag = $('saveNag');
+  const show = !!e && (e.work || 0) > 20 * 60e3 && Date.now() > (e.snooze || 0) && hasDrawing(S);
+  if (nag.hidden === show) nag.hidden = !show;
+}
+const hasDrawing = s => !!s && (s.objs.length > 0 || !!s.map || !!s.bg || Object.values(s.docs).some(d => d.objs.length || d.map || d.bg));
+function markExported(id) {
+  const e = PROJ.find(x => x.id === id);
+  if (e) { e.exp = Date.now(); e.work = 0; e.snooze = 0; saveIndex(); }
+  checkNag();
+}
+function useState(st, pid) {
+  S = st; curPid = pid; lastEdit = 0; lsSet(KEY + '-cur', pid);
+  selId = null; view.auto = true; ui.calib = null; ui.draw = null;
+  if (!Number.isFinite(S.ox)) { const c = DEF_CENTER[S.mode]; centerOn(c[0], c[1]); }
+  for (const m of Object.keys(S.docs)) if (!Number.isFinite(S.docs[m].ox)) S.docs[m].ox = undefined;
+  loadStoredImages();
+  curType = DEF_TYPE[S.mode];
+  if (LV.includes(S.mode)) lastLv = S.mode;
+  setTool('select'); syncSettings();
+  undoStack = [JSON.stringify(S)]; redoStack = []; updateUndoButtons();
+  renderPanel(); renderBg(); fitView(); render(); checkNag();
+}
+function readProject(id) {
+  try { return sanitize(JSON.parse(lsGet(PKEY(id)))); } catch (e) { return null; }
+}
+function projectJSON(st) {
+  const images = {}, ids = new Set();
+  if (st.bg) ids.add(st.bg.img);
+  for (const m of Object.keys(st.docs)) if (st.docs[m] && st.docs[m].bg) ids.add(st.docs[m].bg.img);
+  for (const id of ids) { const v = IMAGES[id] || lsGet(KEY + '-img-' + id); if (v) images[id] = v; }
+  return JSON.stringify(Object.assign({}, st, { images }), null, 1);
+}
+function slugOf(st) {
+  const s = (st.cart.projet || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return s.length <= 40 ? s : s.slice(0, 41).replace(/-[^-]*$/, '') || s.slice(0, 40);
+}
+function exportProject(id) {
+  if (id === curPid) saveNow();
+  const st = id === curPid ? S : readProject(id);
+  if (!st) { toast('Ce dossier est illisible.'); return; }
+  download((slugOf(st) || 'mon') + '-dossier.json', new Blob([projectJSON(st)], { type: 'application/json' }));
+  markExported(id);
+  toast('Copie enregistrée dans vos téléchargements. Pour la reprendre : « Mes dossiers » → « Ouvrir un fichier ».');
+}
+function cleanImages() {
+  const used = new Set();
+  for (const e of PROJ) { const s = lsGet(PKEY(e.id)) || ''; for (const m of s.matchAll(/"img":"([a-z0-9_-]+)"/gi)) used.add(m[1]); }
+  if (S) usedImageIds().forEach(id => used.add(id));
+  const keys = [];
+  try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith(KEY + '-img-')) keys.push(k); } } catch (e) { /* ignore */ }
+  for (const k of keys) { const id = k.slice((KEY + '-img-').length); if (!used.has(id)) { lsDel(k); storedImgs.delete(id); } }
+}
+function storageUsed() {
+  let n = 0;
+  try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith(KEY)) n += k.length + (localStorage.getItem(k) || '').length; } } catch (e) { /* ignore */ }
+  return n;
+}
+const isKept = () => !!curPid && (PROJ.some(e => e.id === curPid) || undoStack.length > 1);
+function newProject(st, msg, persist) {
+  if (isKept()) saveNow();
+  useState(st, newPid());
+  if (persist) saveNow();
+  if (msg) toast(msg);
+}
+function openProjects() {
+  if (isKept()) saveNow();
+  const body = $('dlgBody'), dlg = $('dlg');
+  const fmt = t => t ? new Date(t).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
+  const list = PROJ.slice().sort((a, b) => (b.upd || 0) - (a.upd || 0));
+  const used = storageUsed() / 1e6;
+  body.innerHTML = `<div style="display:flex;justify-content:space-between;gap:10px"><div><h2>Mes dossiers</h2><p class="small muted">Vos dossiers sont enregistrés automatiquement <b>dans ce navigateur, sur cet appareil</b>. Pour les mettre à l’abri ou les ouvrir ailleurs, enregistrez une copie (.json) : clé USB, Drive, iCloud…</p></div><button id="pClose" title="Fermer">✕</button></div>` +
+    `<div id="pList">${list.length ? list.map(e => {
+      const cur = e.id === curPid, safe = (e.exp || 0) >= (e.upd || 0) - 1500;
+      return `<div class="prj${cur ? ' cur' : ''}" data-id="${e.id}"><div class="pi"><b>${esc(e.name || 'Dossier sans nom')}</b><span class="small muted">${e.sub ? esc(e.sub) + ' · ' : ''}modifié le ${fmt(e.upd)}</span>` +
+        `<div>${cur ? '<span class="tag ok">ouvert</span>' : ''}<span class="tag ${safe ? 'ok' : 'c'}">${safe ? 'copie à jour' : e.exp ? 'copie ancienne' : 'aucune copie'}</span></div></div>` +
+        `<div class="pa">${cur ? '' : '<button data-a="open" class="primary">Reprendre</button>'}<button data-a="exp" title="Télécharger une copie (.json)">Copie .json</button><button data-a="dup">Dupliquer</button><button data-a="del" class="danger">Supprimer</button></div></div>`;
+    }).join('') : '<p class="muted">Aucun dossier enregistré pour l’instant : il apparaîtra ici dès votre premier dessin.</p>'}</div>` +
+    `<div class="row" style="margin-top:12px;flex-wrap:wrap"><button id="pNew" class="primary">+ Nouveau dossier</button><button id="pImport">Ouvrir un fichier .json…</button><span class="small muted" style="margin-left:auto">Espace utilisé : ${used < 0.1 ? '< 0,1' : used.toFixed(1).replace('.', ',')} Mo sur environ 5 Mo</span></div>`;
+  $('pClose').addEventListener('click', closeDlg);
+  $('pNew').addEventListener('click', () => { closeDlg(); newProject(blankState(), 'Nouveau dossier créé.'); });
+  $('pImport').addEventListener('click', () => { closeDlg(); $('fileIn').click(); });
+  body.querySelectorAll('.prj').forEach(row => row.querySelectorAll('[data-a]').forEach(b => b.addEventListener('click', () => {
+    const id = row.dataset.id, a = b.dataset.a;
+    if (a === 'open') {
+      const st = readProject(id);
+      if (!st) { toast('Ce dossier est illisible.'); return; }
+      if (isKept()) saveNow();
+      closeDlg(); useState(st, id); toast('Dossier repris.');
+    } else if (a === 'exp') { exportProject(id); openProjects(); }
+    else if (a === 'dup') {
+      if (id === curPid) saveNow();
+      const st = readProject(id);
+      if (!st) { toast('Ce dossier est illisible.'); return; }
+      st.cart.projet = ((st.cart.projet || 'Dossier') + ' (copie)').slice(0, 200);
+      const nid = newPid(), str = JSON.stringify(st), src = PROJ.find(x => x.id === id) || {};
+      if (!lsSet(PKEY(nid), str)) { toast('Stockage plein : impossible de dupliquer.'); return; }
+      PROJ.unshift({ id: nid, name: st.cart.projet.slice(0, 80), sub: src.sub || '', upd: Date.now(), size: str.length, exp: 0, work: 0, snooze: 0 });
+      saveIndex(); openProjects();
+    } else if (a === 'del') {
+      if (b.dataset.armed !== '1') { b.dataset.armed = '1'; b.textContent = 'Confirmer la suppression'; return; }
+      PROJ = PROJ.filter(x => x.id !== id); lsDel(PKEY(id)); saveIndex();
+      if (id === curPid) {
+        const next = PROJ.slice().sort((x, y) => (y.upd || 0) - (x.upd || 0))[0], st = next && readProject(next.id);
+        if (st) useState(st, next.id); else useState(blankState(), newPid());
+      }
+      cleanImages(); openProjects();
+    }
+  })));
+  if (!dlg.open) { if (dlg.showModal) { try { dlg.showModal(); } catch (e) { dlg.setAttribute('open', ''); } } else dlg.setAttribute('open', ''); }
+}
 const storedImgs = new Set();
 function save() {
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    try {
-      localStorage.setItem(KEY, JSON.stringify(S));
-      for (const id of usedImageIds()) if (IMAGES[id] && !storedImgs.has(id)) { localStorage.setItem(KEY + '-img-' + id, IMAGES[id]); storedImgs.add(id); }
-    } catch (e) { /* stockage indisponible ou plein : « Enregistrer (.json) » reste possible */ }
-  }, 300);
+  saveTimer = setTimeout(saveNow, 300);
 }
 function loadStoredImages() {
   for (const id of usedImageIds()) {
@@ -2351,7 +2576,7 @@ function updateUndoButtons() { $('bUndo').disabled = undoStack.length < 2; $('bR
    Interactions (souris, tactile, clavier)
    ================================================================ */
 function evPaper(e) {
-  const r = stage.getBoundingClientRect();
+  const r = stageBox.getBoundingClientRect();
   return [(e.clientX - r.left - view.tx) / view.k, (e.clientY - r.top - view.ty) / view.k];
 }
 const isWallOpening = t => t === 'fenetre_p' || t === 'porte_p';
@@ -2567,7 +2792,7 @@ stage.addEventListener('pointermove', e => {
     t.x = e.clientX; t.y = e.clientY;
     if (gest) {
       if (touches.size >= 2) {
-        const n = pinchState(), r = stage.getBoundingClientRect();
+        const n = pinchState(), r = stageBox.getBoundingClientRect();
         if (gest.d > 0 && n.d > 0) {
           view.tx += n.cx - gest.cx; view.ty += n.cy - gest.cy;
           zoomAt(n.d / gest.d, n.cx - r.left, n.cy - r.top);
@@ -2604,7 +2829,10 @@ stage.addEventListener('pointermove', e => {
       }
       getPts(d.o).forEach((pt, i) => { pt[0] = d.orig[i][0] + dx; pt[1] = d.orig[i][1] + dy; });
     }
-    render(); return;
+    if (d.kind === 'bg') { updateBg(); renderOverlay(); }
+    else if (lastRenderMs > 40) { d.ghost = true; renderOverlay(); }   // dessin lourd : aperçu dans la surcouche, rendu complet au relâcher
+    else renderSoon();
+    return;
   }
   if (tool === 'calib') { ui.hover = { p: w, kind: 'raw' }; renderOverlay(); return; }
   if (tool === 'poly' || tool === 'rect' || tool === 'cote' || tool === 'texte' || tool === 'niveau' || tool === 'sym') {
@@ -2664,7 +2892,7 @@ stage.addEventListener('dblclick', e => {
 });
 stage.addEventListener('wheel', e => {
   e.preventDefault();
-  const r = stage.getBoundingClientRect();
+  const r = stageBox.getBoundingClientRect();
   zoomAt(Math.pow(1.0015, -e.deltaY), e.clientX - r.left, e.clientY - r.top);
 }, { passive: false });
 stage.addEventListener('contextmenu', e => e.preventDefault());
@@ -2869,7 +3097,7 @@ function applyDXF(P, o) {
   }
   for (const it of items) {
     if (it.k === 'text' && stats.text < 500) {
-      if (/^\d+[.,]\d+ m2$/.test(it.text)) continue;
+      if (/^[\d ]+[.,]\d+ m2$/.test(it.text)) continue;
       raw.push({ type: 'texte', p: T(it.p), text: it.text, size: it.h ? it.h * 1000 / S.scale : 3.2 }); stats.text++;
     } else if (it.k === 'cote' && stats.cote < 500) { raw.push({ type: 'cote', a: T(it.a), b: T(it.b) }); stats.cote++; }
   }
@@ -2884,7 +3112,7 @@ function openDXFImport(P, fname) {
   if (famOf(S.mode) === 'insertion') { toast('L’import DXF se fait dans un plan à l’échelle (masse, niveaux, façades, coupe).'); return; }
   const types = MODE_TYPES[S.mode], body = $('dlgBody'), dlg = $('dlg');
   const closedL = types.filter(t => !TYPES[t].open && !TYPES[t].max), openL = types.filter(t => (TYPES[t].open || TYPES[t].thick) && !TYPES[t].max);
-  const defC = closedL.includes(DEF_TYPE[S.mode]) ? DEF_TYPE[S.mode] : closedL[0] || '', defO = openL.find(t => !TYPES[t].special) || openL[0] || '';
+  const defT = S.mode === 'masse' ? 'existant' : DEF_TYPE[S.mode], defC = closedL.includes(defT) ? defT : closedL[0] || '', defO = openL.find(t => !TYPES[t].special) || openL[0] || '';
   const opt = (list, def) => list.map(t => `<option value="${t}"${t === def ? ' selected' : ''}>${esc(TYPES[t].label)}</option>`).join('') + '<option value="">Ne pas importer</option>';
   const ex = dxfExtent(P.items);
   if (!ex) { toast('Ce fichier DXF ne contient aucune entité reconnue (lignes, polylignes, cercles, arcs, textes).'); return; }
@@ -2981,6 +3209,7 @@ function switchMode(m) {
   if (m === S.mode || !MODES.includes(m)) return;
   setTool('select');
   stashActive(); loadDoc(m);
+  $('coords').textContent = '';
   if (LV.includes(m)) lastLv = m;
   selId = null; ui.calib = null;
   curType = DEF_TYPE[m];
@@ -3026,8 +3255,7 @@ function toast(msg) {
   clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 5000);
 }
 const MODE_FILE = { masse: 'plan-de-masse', facade: 'facades', coupe: 'coupe', situation: 'plan-de-situation', insertion: 'insertion', ss: 'plan-sous-sol', rdc: 'plan-rez-de-chaussee', e1: 'plan-etage-1', e2: 'plan-etage-2', cb: 'plan-combles' };
-function projectSlug() { return (S.cart.projet || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40); }
-function fileBase() { const s = projectSlug(); return (s ? s + '-' : '') + MODE_FILE[S.mode]; }
+function fileBase() { const s = slugOf(S); return (s ? s + '-' : '') + MODE_FILE[S.mode]; }
 function download(name, blob) {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob); a.download = name;
@@ -3071,7 +3299,7 @@ window.addEventListener('afterprint', () => { $('printRoot').innerHTML = ''; });
 
 /* ---------- DXF (R12, mètres, 1 unité = 1 m) ---------- */
 function dxfAscii(s) {
-  return String(s).replace(/²/g, '2').replace(/[–—−]/g, '-').replace(/[’‘]/g, "'").replace(/±/g, '+/-')
+  return String(s).replace(/²/g, '2').replace(/[\u00a0\u202f]/g, ' ').replace(/[–—−]/g, '-').replace(/[’‘]/g, "'").replace(/±/g, '+/-')
     .normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\x20-\x7E]/g, '?');
 }
 // hachures : [angle en degrés, espacement en mm de papier]
@@ -3404,7 +3632,7 @@ function closeDlg() { const dlg = $('dlg'); if (dlg.close) { try { dlg.close(); 
 function renderDossierResult() {
   const d = S.dossier, res = decideDossier(d), el = $('dRes');
   const cls = res.kind === 'dp' ? 'dp' : res.kind === 'pc' ? 'pc' : 'no';
-  let h = `<h4>2. Ce qu’il faut déposer</h4><div class="res ${cls}"><b class="big">${res.kind === 'pc' && d.maison ? 'Permis de construire pour maison individuelle (PCMI)' : KIND_LABEL[res.kind]}${res.sure ? '' : ' (probable)'}</b>` +
+  let h = `<h4>2. Ce qu’il faut déposer</h4><div class="res ${cls}"><b class="big">${res.kind === 'pc' && d.maison ? 'Permis de construire pour maison individuelle (PCMI)' : KIND_LABEL[res.kind]}</b>${res.sure ? '' : ' <span class="tag c">à confirmer en mairie</span>'}` +
     (res.why.length ? `<ul>${res.why.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : '') +
     (res.kind === 'incomplet' ? '<p class="small">Saisissez l’emprise au sol et la surface de plancher créées (ou la surface du bassin).</p>' : '') +
     (res.cerfa ? `<p class="small">Formulaire : cerfa n° ${esc(res.cerfa)}. <span class="muted">Vérifiez le numéro et la version en vigueur sur service-public.fr.</span></p>` : '') +
@@ -3495,7 +3723,88 @@ $('dxfIn').addEventListener('change', e => {
   };
   r.readAsText(f);
 });
+
+/* ---------- Visite guidée (premier lancement, puis bouton « ? ») ---------- */
+const TOUR = [
+  [null, 'Bienvenue !', '<p>Cet outil vous aide à dessiner <b>les plans de votre dossier d’urbanisme</b> (déclaration préalable, permis de construire), à l’échelle, sans rien installer.</p><p>Un exemple est déjà chargé. Faisons le tour en une minute.</p>'],
+  ['#bDossier', '1. Commencez par « Mon dossier »', '<p>Décrivez votre projet : l’outil vous dit <b>quel dossier déposer</b>, si un architecte est obligatoire et <b>quelles pièces fournir</b>.</p><p>C’est aussi là que vous produirez le <b>PDF complet</b> du dossier.</p>'],
+  ['#modes', '2. Une vue par pièce', '<p><b>Situation</b> (DP1) : tapez votre adresse, la carte IGN et la parcelle s’affichent. <b>Plan de masse</b> (DP2). <b>Niveaux</b> : surface de plancher. <b>Coupe</b> (DP3). <b>Façades</b> (DP4). <b>Insertion</b> (DP6) : votre projet sur une photo.</p><p>Chaque vue garde son propre dessin.</p>'],
+  ['#cardHelp', '3. L’aide de chaque pièce', '<p>Ce cadre explique ce que la mairie attend dans la pièce affichée. Lisez-le avant de dessiner.</p>'],
+  ['.tools', '4. Dessiner', '<p>Choisissez <b>ce que vous dessinez</b> dans la liste (construction, clôture, mur…), puis l’outil <b>Rectangle</b> (glisser) ou <b>Polygone</b> (un clic par sommet, double-clic pour finir).</p><p>Fenêtres et portes : choisissez-les dans la liste puis cliquez sur un mur. <b>Copier / Coller</b> reprend un élément, même d’un niveau à l’autre.</p><p>Sur tablette : deux doigts pour zoomer.</p>'],
+  ['#cardWiz', '5. L’assistant', '<p>Pour aller vite et juste : saisissez les <b>dimensions exactes</b> d’un bâtiment ou d’une pièce.</p><p>Sur le plan de masse, il crée aussi <b>les 4 façades</b> de votre construction, avec ses fenêtres.</p>'],
+  ['#cardSel', '6. Modifier un élément', '<p>Cliquez sur un élément du dessin (outil Sélection) : ici, vous réglez son nom, ses <b>longueurs au centimètre</b>, son matériau… <kbd>Suppr</kbd> l’efface, <kbd>Ctrl+Z</kbd> annule.</p>'],
+  ['#cardSheet', '7. Feuille et échelle', '<p>Format A4 ou A3, orientation, échelle. <b>Meilleure échelle</b> choisit la plus grande échelle où tout tient. Réglez le <b>nord</b> sur le plan de masse.</p>'],
+  ['#cardCart', '8. Le cartouche', '<p>Votre nom, l’adresse, la parcelle : ces informations apparaissent en bas de chaque plan. Le champ <b>Projet</b> sert aussi de nom à votre dossier.</p>'],
+  ['#bPDF', '9. Exporter', '<p><b>Exporter PDF</b> imprime la vue affichée : choisissez « Enregistrer au format PDF », marges <b>Aucune</b>, échelle <b>100 %</b> pour respecter l’échelle.</p><p>Pour le dossier complet (page de garde + tous les plans), passez par « Mon dossier ».</p>'],
+  ['#bProjects', '10. Reprendre plus tard', '<p>Pas de compte : votre travail est <b>enregistré automatiquement dans ce navigateur</b>, sur cet appareil. <b>Mes dossiers</b> permet de reprendre, dupliquer ou supprimer chaque dossier.</p><p>Gardez une <b>copie .json</b> (clé USB, Drive…) : c’est elle qui vous protège si l’historique du navigateur est effacé. Un rappel vous le proposera.</p>'],
+  ['#bNew', 'À vous !', '<p>Cliquez sur <b>Nouveau</b> pour partir d’une feuille vide (l’exemple reste dans « Mes dossiers » si vous l’avez modifié), puis commencez par « Mon dossier ».</p><p>Le bouton <b>?</b> relance cette visite à tout moment, ☾ passe en mode sombre.</p>']
+];
+let tourI = -1;
+function tourShow() {
+  const [sel0, title, html] = TOUR[tourI], hole = $('tourHole'), box = $('tourBox');
+  $('tourStep').textContent = `Étape ${tourI + 1} sur ${TOUR.length}`;
+  $('tourTitle').textContent = title; $('tourText').innerHTML = html;
+  $('tourPrev').hidden = tourI === 0;
+  $('tourNext').textContent = tourI === TOUR.length - 1 ? 'Terminer' : 'Suivant';
+  const el = sel0 && document.querySelector(sel0);
+  let r = null;
+  if (el && !el.closest('[hidden]')) {
+    try { el.scrollIntoView({ block: 'nearest' }); } catch (e) { /* ignore */ }
+    r = el.getBoundingClientRect();
+    if (!r.width || !r.height) r = null;
+  }
+  const vw = window.innerWidth, vh = window.innerHeight, bw = Math.min(340, vw - 24);
+  hole.classList.toggle('none', !r);
+  if (!r) {
+    Object.assign(hole.style, { left: vw / 2 + 'px', top: vh / 2 + 'px', width: '0px', height: '0px' });
+    Object.assign(box.style, { left: Math.max(12, (vw - bw) / 2) + 'px', top: Math.max(12, vh / 2 - 120) + 'px' });
+    return;
+  }
+  const pad = 5;
+  Object.assign(hole.style, { left: r.left - pad + 'px', top: r.top - pad + 'px', width: r.width + 2 * pad + 'px', height: r.height + 2 * pad + 'px' });
+  const bh = box.offsetHeight || 200;
+  let top = r.bottom + 14;
+  if (top + bh > vh - 8) top = r.top - bh - 14;
+  if (top < 8) top = Math.max(8, Math.min(vh - bh - 8, r.top + 10));
+  let left = r.left + r.width / 2 - bw / 2;
+  if (r.width > vw * 0.5 || top === Math.max(8, Math.min(vh - bh - 8, r.top + 10))) left = r.left > vw / 2 ? r.left - bw - 14 : r.right + 14;
+  left = Math.max(12, Math.min(vw - bw - 12, left));
+  Object.assign(box.style, { left: left + 'px', top: top + 'px' });
+}
+function tourGo(i) {
+  if (i < 0) return;
+  if (i >= TOUR.length) { tourEnd(); return; }
+  tourI = i; $('tour').hidden = false; tourShow();
+}
+function tourEnd() {
+  $('tour').hidden = true; tourI = -1;
+  try { localStorage.setItem(KEY + '-tour', '1'); } catch (e) { /* ignore */ }
+}
+$('bTour').addEventListener('click', () => tourGo(0));
+$('tourNext').addEventListener('click', () => tourGo(tourI + 1));
+$('tourPrev').addEventListener('click', () => tourGo(tourI - 1));
+$('tourSkip').addEventListener('click', tourEnd);
+window.addEventListener('keydown', e => {
+  if (tourI < 0) return;
+  if (e.key === 'Escape') tourEnd(); else if (e.key === 'ArrowRight' || e.key === 'Enter') tourGo(tourI + 1); else if (e.key === 'ArrowLeft') tourGo(tourI - 1); else return;
+  e.preventDefault(); e.stopImmediatePropagation();
+}, true);
+window.addEventListener('resize', () => { if (tourI >= 0) tourShow(); });
 $('bCopy').addEventListener('click', copySel);
+// mode sombre : suit le réglage du système tant que l'utilisateur n'a pas choisi
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  const b = $('bTheme'); b.textContent = t === 'dark' ? '☀' : '☾'; b.title = t === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre';
+}
+applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light');
+$('bTheme').addEventListener('click', () => {
+  const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  applyTheme(t); try { localStorage.setItem(KEY + '-theme', t); } catch (e) { /* ignore */ }
+});
+if (window.matchMedia) {
+  const mq = matchMedia('(prefers-color-scheme: dark)'), f = e => { let s = null; try { s = localStorage.getItem(KEY + '-theme'); } catch (er) { /* ignore */ } if (!s) applyTheme(e.matches ? 'dark' : 'light'); };
+  if (mq.addEventListener) mq.addEventListener('change', f); else if (mq.addListener) mq.addListener(f);
+}
 $('bPaste').addEventListener('click', pasteClip);
 $('dbOk').addEventListener('click', () => {
   if (ui.draw && ui.draw.pts.length >= (TYPES[curType].open ? 2 : 3)) finishPoly();
@@ -3503,11 +3812,11 @@ $('dbOk').addEventListener('click', () => {
 });
 $('dbUndo').addEventListener('click', () => { if (ui.draw) { ui.draw.pts.pop(); if (!ui.draw.pts.length) ui.draw = null; renderOverlay(); } });
 $('dbCancel').addEventListener('click', () => setTool(tool));
-$('bSave').addEventListener('click', () => {
-  const images = {};
-  for (const id of usedImageIds()) if (IMAGES[id]) images[id] = IMAGES[id];
-  download((projectSlug() || 'mon') + '-projet.json', new Blob([JSON.stringify(Object.assign({}, S, { images }), null, 1)], { type: 'application/json' }));
-});
+$('bSave').addEventListener('click', () => exportProject(curPid));
+$('bProjects').addEventListener('click', openProjects);
+$('nagSave').addEventListener('click', () => exportProject(curPid));
+$('nagLater').addEventListener('click', () => { const e = PROJ.find(x => x.id === curPid); if (e) { e.snooze = Date.now() + 30 * 60e3; saveIndex(); } $('saveNag').hidden = true; });
+window.addEventListener('pagehide', () => { if (saveTimer) saveNow(); });
 $('bOpen').addEventListener('click', () => $('fileIn').click());
 $('fileIn').addEventListener('change', e => {
   const f = e.target.files[0]; e.target.value = '';
@@ -3517,25 +3826,13 @@ $('fileIn').addEventListener('change', e => {
     try {
       const st = sanitize(JSON.parse(r.result));
       if (!st) throw new Error('format');
-      S = st; selId = null; view.auto = true; ui.calib = null;
-      if (!Number.isFinite(S.ox)) { const c = DEF_CENTER[S.mode]; centerOn(c[0], c[1]); }
-      for (const m of Object.keys(S.docs)) if (!Number.isFinite(S.docs[m].ox)) { S.docs[m].ox = undefined; }
-      curType = DEF_TYPE[S.mode];
-      setTool('select'); syncSettings(); fitView(); afterChange(); toast('Projet ouvert.');
-    } catch (err) { toast('Fichier illisible : ce n’est pas un projet enregistré par cet outil.'); }
+      newProject(st, 'Dossier ouvert et ajouté à « Mes dossiers ».', true);
+      markExported(curPid);
+    } catch (err) { toast('Fichier illisible : ce n’est pas un dossier enregistré par cet outil.'); }
   };
   r.readAsText(f);
 });
-let newArmed = null;
-$('bNew').addEventListener('click', () => {
-  const b = $('bNew');
-  if (!newArmed) {
-    b.textContent = 'Confirmer ?'; newArmed = setTimeout(() => { b.textContent = 'Nouveau'; newArmed = null; }, 3500); return;
-  }
-  clearTimeout(newArmed); newArmed = null; b.textContent = 'Nouveau';
-  S = blankState(); centerOn(15, 10); selId = null; view.auto = true; curType = DEF_TYPE.masse;
-  setTool('select'); syncSettings(); fitView(); afterChange();
-});
+$('bNew').addEventListener('click', () => newProject(blankState(), 'Nouveau dossier. Le précédent reste dans « Mes dossiers ».'));
 $('bUndo').addEventListener('click', doUndo);
 $('bRedo').addEventListener('click', doRedo);
 $('zIn').addEventListener('click', () => { const b = $('stageBox'); zoomAt(1.25, b.clientWidth / 2, b.clientHeight / 2); });
@@ -3548,23 +3845,34 @@ window.addEventListener('resize', () => { if (view.auto) { fitView(); render(); 
    Démarrage
    ================================================================ */
 function init() {
-  let saved = null;
-  try { saved = sanitize(JSON.parse(localStorage.getItem(KEY))); } catch (e) { saved = null; }
-  const hasContent = s => s && (s.objs.length || s.map || s.bg || Object.values(s.docs).some(d => d.objs.length || d.map || d.bg));
-  if (hasContent(saved)) {
-    S = saved;
-    if (!Number.isFinite(S.ox)) { const c = DEF_CENTER[S.mode]; centerOn(c[0], c[1]); }
-    loadStoredImages();
-  } else {
-    S = exampleState(); centerOnContent();
-    seedExamples();
+  loadIndex();
+  let cur = lsGet(KEY + '-cur');
+  // ancienne version : un seul projet sous KEY -> devient le premier dossier
+  const legacy = lsGet(KEY);
+  if (legacy) {
+    let old = null;
+    try { old = sanitize(JSON.parse(legacy)); } catch (e) { old = null; }
+    if (old && hasDrawing(old)) {
+      const id = newPid();
+      if (lsSet(PKEY(id), legacy)) {
+        PROJ.unshift({ id, name: (old.cart.projet || '').slice(0, 80), sub: (old.cart.commune || '').slice(0, 80), upd: Date.now(), size: legacy.length, exp: 0, work: 0, snooze: 0 });
+        saveIndex(); lsDel(KEY); cur = id;
+      }
+    } else lsDel(KEY);
   }
+  if (!cur || !PROJ.some(e => e.id === cur)) { const last = PROJ.slice().sort((a, b) => (b.upd || 0) - (a.upd || 0))[0]; cur = last ? last.id : null; }
+  const saved = cur ? readProject(cur) : null;
+  if (saved) { S = saved; curPid = cur; loadStoredImages(); if (!Number.isFinite(S.ox)) { const c = DEF_CENTER[S.mode]; centerOn(c[0], c[1]); } }
+  else { S = exampleState(); centerOnContent(); seedExamples(); curPid = newPid(); }
   curType = DEF_TYPE[S.mode];
   if (LV.includes(S.mode)) lastLv = S.mode;
   bindSettings(); setTool('select'); syncSettings();
   undoStack = [JSON.stringify(S)]; updateUndoButtons();
-  renderPanel(); fitView(); render();
+  renderPanel(); fitView(); render(); checkNag();
   requestAnimationFrame(() => { if (view.auto) { fitView(); render(); } });
+  let seen = '1';
+  try { seen = localStorage.getItem(KEY + '-tour'); } catch (e) { /* stockage indisponible : pas de visite automatique */ }
+  if (!seen) setTimeout(() => tourGo(0), 500);
 }
 init();
 })();

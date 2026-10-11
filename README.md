@@ -35,7 +35,10 @@ Chaque vue a un texte d’aide en français expliquant ce que le service instruc
 - **Image de fond** (cadastre, photo, plan existant) avec mise à l’échelle par deux points.
 - **Copier / coller** (Ctrl+C, Ctrl+V ou boutons), y compris d’une vue à l’autre quand le type d’objet existe dans les deux (ex. un mur d’un niveau à l’autre).
 - **Tactile** : un doigt pour dessiner ou déplacer, deux doigts pour zoomer et déplacer la vue, barre « Terminer / Dernier point / Abandonner » pour les tracés.
-- Annuler / rétablir, enregistrement automatique dans le navigateur, sauvegarde et ouverture de projets `.json`.
+- **Visite guidée** au premier lancement (11 étapes, relançable avec le bouton **?**).
+- **Mode sombre** (suit le réglage du système, bouton ☾ / ☀ pour forcer) ; la feuille reste blanche comme le papier.
+- **Mes dossiers** : plusieurs dossiers enregistrés automatiquement dans le navigateur, à reprendre, dupliquer, supprimer ou télécharger en copie `.json` (pour les mettre à l’abri ou les ouvrir sur un autre appareil). Un rappel propose d’enregistrer une copie après une vingtaine de minutes de travail.
+- Annuler / rétablir ; « Ouvrir… » reprend une copie `.json`.
 
 ## Exports
 
@@ -45,7 +48,8 @@ Chaque vue a un texte d’aide en français expliquant ce que le service instruc
 
 ## Confidentialité
 
-Aucun compte, aucune donnée envoyée à un serveur de l’auteur. **Seule la vue Situation** contacte des services publics depuis votre navigateur : géocodage de l’adresse, tuiles de carte et API cadastre de la **Géoplateforme de l’IGN**. L’adresse que vous tapez et la zone affichée leur sont donc transmises. Vos projets restent dans le stockage local de votre navigateur et dans les fichiers que vous enregistrez.
+Aucun compte, aucune donnée envoyée à un serveur de l’auteur. **Seule la vue Situation** contacte des services publics depuis votre navigateur : géocodage de l’adresse, tuiles de carte et API cadastre de la **Géoplateforme de l’IGN**. L’adresse que vous tapez et la zone affichée leur sont donc transmises. Vos dossiers restent dans le stockage local de votre navigateur (pas de compte, rien sur un serveur) et dans les fichiers que vous enregistrez. Vider les données du navigateur efface les dossiers : gardez des copies `.json`.
+
 
 
 ## Développement
