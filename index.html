@@ -306,11 +306,13 @@ html[data-theme=dark] dialog::backdrop{background:rgba(0,0,0,.6)}
           <li><b>Polygone</b> : un clic par sommet ; double-clic ou <kbd>Entrée</kbd> pour terminer, <kbd>Retour</kbd> retire le dernier point, <kbd>Échap</kbd> abandonne. Les lignes (clôture, haie, terrain naturel…) restent ouvertes.</li>
           <li><b>Rectangle</b> : glissez. En façade, un simple clic pose un élément (fenêtre, porte, lucarne, portail…) à ses dimensions courantes.</li>
           <li><b>Fenêtres et portes sur un mur</b> (plan de masse, niveaux) : choisissez « Fenêtre (sur mur) » ou « Porte (sur mur) », puis cliquez sur le mur.</li>
-          <li><b>Modifier</b> : double-clic sur un côté pour ajouter un sommet, glissez un sommet pour le déplacer, <kbd>Suppr</kbd> pour effacer, flèches pour décaler (<kbd>Maj</kbd> : ×10).</li>
+          <li><b>Modifier</b> : double-clic sur un côté pour ajouter un sommet, glissez un sommet pour le déplacer, <kbd>Suppr</kbd> pour effacer, flèches pour décaler (<kbd>Maj</kbd> : ×10). Maintenez <kbd>Alt</kbd> en glissant pour déplacer sans aimantation à la grille.</li>
+          <li><b>Sélection multiple</b> : glissez un rectangle dans le vide autour des éléments, ou <kbd>Maj</kbd> + clic pour en ajouter ou en retirer ; <kbd>Ctrl+A</kbd> sélectionne tout. Glissez l’un d’eux pour tous les déplacer.</li>
+          <li><b>Déplacer une fenêtre ou une porte</b> : glissez-la, elle suit le mur (au pas de 5 cm) et passe d’un mur à l’autre ; éloignée de tout mur, elle se déplace librement. Les flèches la font glisser le long du mur.</li>
           <li><b>Copier / coller</b> : <kbd>Ctrl+C</kbd> / <kbd>Ctrl+V</kbd>, aussi d’une vue à l’autre (un mur d’un niveau à l’autre, par exemple).</li>
           <li><b>Annuler / rétablir</b> : <kbd>Ctrl+Z</kbd> / <kbd>Ctrl+Y</kbd>.</li>
           <li><b>Outils au clavier</b> : <kbd>V</kbd> sélection, <kbd>H</kbd> main, <kbd>P</kbd> polygone, <kbd>R</kbd> rectangle, <kbd>C</kbd> cote, <kbd>T</kbd> texte, <kbd>N</kbd> niveau, <kbd>S</kbd> symbole.</li>
-          <li><b>Vue</b> : molette pour zoomer, barre d’espace ou outil Main pour déplacer ; sur tablette, deux doigts.</li>
+          <li><b>Vue</b> : molette pour zoomer, barre d’espace, clic molette ou outil Main pour déplacer ; sur tablette, deux doigts.</li>
           <li><b>Fond de plan</b> : importez une image, « Mettre à l’échelle », cliquez deux points dont vous connaissez la distance et saisissez-la.</li>
           <li><b>PDF</b> : dans la fenêtre d’impression, « Enregistrer au format PDF », marges « Aucune », échelle 100 %.</li>
           <li><b>DXF</b> : export en mètres (1 unité = 1 m), un calque par type, textes sans accents ; import des lignes, polylignes, cercles, textes et cotes.</li>
@@ -400,7 +402,7 @@ const TYPES = {
   terrasse: { label: 'Terrasse / dalle', fill: '#e9d8c4', stroke: '#78350f', sw: 0.25, order: 0.7, name: 'Terrasse', dxf: 'TERRASSE', aci: 30 },
   piscine: { label: 'Piscine', fill: '#bfdbfe', stroke: '#1d4ed8', sw: 0.35, order: 0.8, name: 'Piscine', dxf: 'PISCINE', aci: 5 },
   stationnement: { label: 'Stationnement', fill: '#eef2f7', pat: 'park', stroke: '#64748b', sw: 0.3, order: 0.9, name: 'Stationnement', dxf: 'STATIONNEMENT', aci: 8 },
-  existant: { label: 'Construction existante', fill: '#c9ccd1', stroke: '#111111', sw: 0.35, order: 2, name: 'Existant', len: true, dxf: 'EXISTANT', aci: 8 },
+  existant: { label: 'Construction existante', fill: '#c9ccd1', tint: true, stroke: '#111111', sw: 0.35, order: 2, name: 'Existant', len: true, dxf: 'EXISTANT', aci: 8 },
   demolir: { label: 'Construction à démolir', fill: '#fde68a', pat: 'demolir', stroke: '#92400e', sw: 0.35, dash: '2 1', order: 3, name: 'À démolir', len: true, dxf: 'A_DEMOLIR', aci: 2 },
   projet: { label: 'Construction projetée', fill: '#fca5a5', pat: 'projet', stroke: '#b91c1c', sw: 0.5, order: 4, name: 'Projet', len: true, dxf: 'PROJET', aci: 1 },
   cloture: { label: 'Clôture', open: true, stroke: '#111111', sw: 0.35, dash: '3 0.8 0.8 0.8', order: 5, name: '', dxf: 'CLOTURE', aci: 7, lt: 'DASHED' },
@@ -474,7 +476,7 @@ const SYMS = {
 const symSize = k => SYMS[k].dyn ? Math.round(4 * S.scale / 1000 * 10) / 10 : SYMS[k].s;
 
 const HINTS = {
-  select: 'Cliquez un objet, glissez pour le déplacer. Double-clic sur un côté : ajouter un sommet.',
+  select: 'Cliquez un objet, glissez pour le déplacer (Alt : sans aimantation). Glissez dans le vide pour sélectionner plusieurs objets, Maj + clic pour en ajouter. Déplacer la vue : barre d’espace, clic molette ou outil Main.',
   hand: 'Glissez pour déplacer la vue.',
   wall: 'Cliquez sur un mur d’une construction : l’ouverture se place à cet endroit, aux dimensions courantes. Elle se règle ensuite dans « Objet sélectionné ».',
   poly: 'Cliquez les sommets. Double-clic ou Entrée pour terminer, Retour pour annuler le dernier point.',
@@ -588,7 +590,8 @@ const ord = o => TYPES[o.type] ? TYPES[o.type].order : ({ sym: 6, cote: 8, nivea
    État
    ================================================================ */
 let S;                       // projet courant : champs de la vue active à la racine, autres vues dans S.docs
-let selId = null;
+let selId = null;            // objet sélectionné (ou objet « principal » d'une sélection multiple)
+let selMany = [];            // sélection multiple : identifiants (au moins 2), vide sinon
 let tool = 'select';
 let curType = 'projet';
 let curSym = 'arbre';
@@ -763,6 +766,7 @@ function sanitizeDoc(raw, mode, st, pieceFallback) {
         if (typeof o.color === 'string' && HEX.test(o.color)) obj.color = o.color;
       }
       if (TYPES[o.type].thick) obj.ep = clamp(num(o.ep, TYPES[o.type].ep), 0.05, 1);
+      if (TYPES[o.type].tint && typeof o.color === 'string' && HEX.test(o.color)) obj.color = o.color;
       if (TYPES[o.type].ins) {
         if (typeof o.color === 'string' && HEX.test(o.color)) obj.color = o.color;
         if (o.op !== undefined) obj.op = clamp(num(o.op, TYPES[o.type].iop || 0.5), 0.05, 1);
@@ -1150,6 +1154,7 @@ function patternDefs(pre) {
 }
 function fillToken(o) {
   const T = TYPES[o.type];
+  if (T.tint && o.color) return o.color;
   if (T.mat) { const m = o.mat || T.defMat; return m === 'enduit' ? (o.color || MATS.enduit.base) : 'pat:' + m; }
   if (T.pat) return 'pat:' + T.pat;
   return T.fill || 'none';
@@ -1315,13 +1320,21 @@ function legendItems() {
     if (!T) continue;
     let e = byType.get(o.type);
     if (!e) byType.set(o.type, e = new Map());
-    const m = T.mat ? (o.mat || T.defMat) : '';
+    const m = T.mat ? (o.mat || T.defMat) : T.tint ? (o.color || '') : '';
     if (!e.has(m)) e.set(m, o);
   }
   for (const t of MODE_TYPES[S.mode]) {
     const T = TYPES[t], e = byType.get(t);
     if (!e) continue;
-    if (T.mat) {
+    if (T.tint) {
+      // une ligne de légende par teinte ; si plusieurs teintes, on les distingue par le nom du bâtiment
+      let k = 0;
+      for (const [m, first] of e) {
+        k++;
+        const nm = first.name && first.name !== T.name ? first.name : 'teinte ' + k;
+        items.push({ label: e.size > 1 ? T.label + ' – ' + nm : T.label, fill: m || T.fill, stroke: T.stroke, sw: T.sw, dash: T.dash });
+      }
+    } else if (T.mat) {
       for (const [m, first] of e) {
         items.push({ label: MATS[m].label + (t === 'toit' ? ' (toiture)' : ' (façade)'), fill: m === 'enduit' ? (first.color || MATS.enduit.base) : 'pat:' + m, stroke: T.stroke, sw: T.sw });
       }
@@ -1461,8 +1474,8 @@ function overlayMarkup() {
   const px = 1 / view.k, da = drawArea();
   let s = `<rect x="${da.x}" y="${da.y}" width="${da.w}" height="${da.h}" fill="none" stroke="#93c5fd" stroke-width="${r3(px)}" stroke-dasharray="${r3(5 * px)} ${r3(4 * px)}"/>`;
   const dash = `stroke-dasharray="${r3(5 * px)} ${r3(3 * px)}"`;
-  const g = ui.drag && ui.drag.ghost && ui.drag.o;
-  if (g) {
+  const ghosts = ui.drag && ui.drag.ghost ? (ui.drag.objs || [ui.drag.o]) : [];
+  for (const g of ghosts) {
     const inner = g.pts ? polyShape(g, 's-') : g.type === 'sym' ? primsMarkup(symPrims(g), 's-') : g.type === 'cote' ? coteMarkup(g) : g.type === 'niveau' ? niveauMarkup(g)
       : txt(toP(g.p)[0], toP(g.p)[1], 0, g.text, g.size || 3.2, {});
     s += `<g opacity="0.8">${inner}</g>`;
@@ -1471,12 +1484,22 @@ function overlayMarkup() {
     const b = S.bg, c = toP([b.cx, b.cy]), pw = b.w * K(), ph = b.w * b.ar * K();
     s += `<rect x="${r3(c[0] - pw / 2)}" y="${r3(c[1] - ph / 2)}" width="${r3(pw)}" height="${r3(ph)}" fill="none" stroke="#f97316" stroke-width="${r3(2 * px)}" ${dash} transform="rotate(${b.rot} ${r3(c[0])} ${r3(c[1])})"/>`;
   }
-  const o = sel();
-  if (o) {
+  const sels = selAll(), many = sels.length > 1;
+  for (const o of sels) {
     const P = getPts(o).map(toP), path = P.map(p => r3(p[0]) + ' ' + r3(p[1])).join('L');
     if (o.pts) s += `<path d="M${path}${isOpen(o) ? '' : 'Z'}" fill="none" stroke="#2563eb" stroke-width="${r3(2 * px)}"/>`;
     else if (o.a) s += `<path d="M${path}" fill="none" stroke="#2563eb" stroke-width="${r3(2 * px)}"/>`;
-    for (const p of P) s += `<circle cx="${r3(p[0])}" cy="${r3(p[1])}" r="${r3(4.5 * px)}" fill="#fff" stroke="#2563eb" stroke-width="${r3(1.5 * px)}"/>`;
+    else if (o.type === 'sym') {   // symbole : cadre autour
+      const bb = primsBBox(symPrims(o)), a = toP([bb.x0, bb.y1]), c = toP([bb.x1, bb.y0]);
+      s += `<rect x="${r3(a[0])}" y="${r3(a[1])}" width="${r3(c[0] - a[0])}" height="${r3(c[1] - a[1])}" fill="none" stroke="#2563eb" stroke-width="${r3(1.5 * px)}" ${dash}/>`;
+    }
+    // poignées (sommets déplaçables) seulement pour un objet seul
+    for (const p of P) s += many ? `<circle cx="${r3(p[0])}" cy="${r3(p[1])}" r="${r3(2.5 * px)}" fill="#2563eb"/>`
+      : `<circle cx="${r3(p[0])}" cy="${r3(p[1])}" r="${r3(4.5 * px)}" fill="#fff" stroke="#2563eb" stroke-width="${r3(1.5 * px)}"/>`;
+  }
+  if (ui.marq && ui.marq.b) {   // rectangle de sélection
+    const a = toP(ui.marq.a), b = toP(ui.marq.b);
+    s += `<rect x="${r3(Math.min(a[0], b[0]))}" y="${r3(Math.min(a[1], b[1]))}" width="${r3(Math.abs(b[0] - a[0]))}" height="${r3(Math.abs(b[1] - a[1]))}" fill="rgba(37,99,235,.08)" stroke="#2563eb" stroke-width="${r3(px)}" ${dash}/>`;
   }
   const h = ui.hover ? toP(ui.hover.p) : null;
   if (ui.draw) {
@@ -1845,7 +1868,7 @@ async function fetchParcel() {
     S.cart.parcelle = `Section ${String(pr.section || '').toUpperCase()} n° ${Number.isFinite(num0) ? num0 : pr.numero || ''}`.slice(0, 80);
     if (!S.cart.commune && pr.nom_com) S.cart.commune = String(pr.nom_com).slice(0, 80);
     const b = bboxOf(pts); centerOn((b.x0 + b.x1) / 2, (b.y0 + b.y1) / 2);
-    selId = o.id; syncSettings(); afterChange();
+    setSel(o.id); syncSettings(); afterChange();
     toast('Parcelle ' + S.cart.parcelle + ' tracée. Elle peut être copiée dans le plan de masse.');
   } catch (e) {
     msg.textContent = 'Service du cadastre indisponible (réseau ou service IGN). Vous pouvez tracer la parcelle à la main avec l’outil Polygone.';
@@ -1899,12 +1922,40 @@ function renderMapPanel() {
    Panneau « Objet sélectionné »
    ================================================================ */
 const sel = () => S.objs.find(o => o.id === selId) || null;
-function fixSel() { if (selId !== null && !sel()) selId = null; }
+function setSel(id) { selId = id; selMany = []; }
+function setSelMany(ids) { ids = [...new Set(ids)]; selId = ids.length ? ids[ids.length - 1] : null; selMany = ids.length > 1 ? ids : []; }
+const selIds = () => selMany.length ? selMany.slice() : selId !== null ? [selId] : [];
+const isSelected = id => selIds().includes(id);
+const selAll = () => { const ids = selIds(); return S.objs.filter(o => ids.includes(o.id)); };
+function toggleSel(id) { const ids = selIds(); setSelMany(ids.includes(id) ? ids.filter(x => x !== id) : ids.concat([id])); }
+function fixSel() {
+  const ok = id => S.objs.some(o => o.id === id);
+  const ids = selIds().filter(ok);
+  if (selId !== null && ok(selId)) { const i = ids.indexOf(selId); ids.splice(i, 1); ids.push(selId); }
+  setSelMany(ids);
+}
 const numRow = (id, label, val, extra) => `<div class="row"><label for="${id}">${label}</label><input type="number" id="${id}" step="0.01" value="${val}"${extra || ''}></div>`;
 
+function renderMultiPanel(el) {
+  const objs = selAll(), count = {};
+  for (const o of objs) { const l = TYPES[o.type] ? TYPES[o.type].label : o.type === 'sym' ? SYMS[o.kind].label : ({ cote: 'Cote', texte: 'Texte', niveau: 'Niveau' }[o.type] || o.type); count[l] = (count[l] || 0) + 1; }
+  const tints = objs.filter(o => TYPES[o.type] && TYPES[o.type].tint);
+  let h = `<p><b>${objs.length} éléments sélectionnés</b></p><div class="small muted">${Object.keys(count).map(l => `${count[l]} × ${esc(l)}`).join(' · ')}</div>` +
+    `<p class="small muted">Glissez l’un d’eux pour tous les déplacer, ou utilisez les flèches du clavier. Maj + clic ajoute ou retire un élément.</p>`;
+  if (tints.length) h += `<div class="row"><label for="mTint">Couleur ${tints.length < objs.length ? '(constructions existantes)' : ''}</label><input type="color" id="mTint" value="${tints[0].color || TYPES[tints[0].type].fill}"></div>`;
+  h += `<div class="row"><button id="mDup">Dupliquer</button><button id="mCopy">Copier</button><button id="mDel" class="danger">Supprimer</button><button id="mNone">Désélectionner</button></div>`;
+  el.innerHTML = h;
+  const t = $('mTint');
+  if (t) { t.addEventListener('input', () => { for (const o of tints) o.color = t.value; render(); }); t.addEventListener('change', commit); }
+  $('mDup').addEventListener('click', duplicateSelected);
+  $('mCopy').addEventListener('click', copySel);
+  $('mDel').addEventListener('click', deleteSelected);
+  $('mNone').addEventListener('click', () => { setSel(null); renderPanel(); render(); });
+}
 function renderPanel() {
   const el = $('objPanel'), o = sel();
-  if (!o) { el.innerHTML = '<p class="muted small">Aucun objet sélectionné. Avec l’outil Sélection, cliquez sur un objet du plan pour le modifier.</p>'; return; }
+  if (selMany.length > 1) { renderMultiPanel(el); return; }
+  if (!o) { el.innerHTML = '<p class="muted small">Aucun objet sélectionné. Avec l’outil Sélection, cliquez sur un objet du plan pour le modifier. Pour en sélectionner plusieurs : glissez un rectangle autour, ou Maj + clic.</p>'; return; }
   let h = '', dl = null, dv = null;
   const on = (id, ev, fn) => { const n = $(id); if (n) n.addEventListener(ev, fn); };
   if (o.pts) {
@@ -1918,6 +1969,7 @@ function renderPanel() {
       if (cur === 'enduit') h += `<div class="row"><label for="oColor">Teinte</label><input type="color" id="oColor" value="${o.color || MATS.enduit.base}"></div>`;
     }
     if (T.thick) h += numRow('oEp', 'Épaisseur (m)', (o.ep || T.ep).toFixed(2), ' min="0.05" max="1"');
+    if (T.tint) h += `<div class="row"><label for="oTint">Couleur</label><input type="color" id="oTint" value="${o.color || T.fill}">${o.color ? '<button id="oTintReset" title="Revenir au gris par défaut">Par défaut</button>' : ''}</div>`;
     if (T.ins) h += `<div class="row"><label for="oIColor">Couleur</label><input type="color" id="oIColor" value="${o.color || T.fill || T.stroke}"></div>` +
       (T.open ? '' : `<div class="row"><label for="oIOp">Opacité</label><input type="range" id="oIOp" min="0.1" max="1" step="0.05" value="${o.op !== undefined ? o.op : T.iop}"></div>`);
     if (o.type === 'portail') h += `<div class="row"><label for="oStyle">Ouverture</label><select id="oStyle"><option value="battant"${(o.style || 'battant') === 'battant' ? ' selected' : ''}>Battant</option><option value="coulissant"${o.style === 'coulissant' ? ' selected' : ''}>Coulissant</option></select></div>`;
@@ -2003,6 +2055,9 @@ function renderPanel() {
   });
   on('oEp', 'change', e => { const v = pf(e.target.value); if (v > 0) o.ep = clamp(v, 0.05, 1); afterChange(); });
   on('oHostEp', 'change', e => { const v = pf(e.target.value); if (v > 0) o.ep = clamp(v, 0.05, 1); afterChange(); });
+  on('oTint', 'input', e => { o.color = e.target.value; live(); });
+  on('oTint', 'change', () => { commit(); renderPanel(); });
+  on('oTintReset', 'click', () => { delete o.color; afterChange(); });
   on('oIColor', 'input', e => { o.color = e.target.value; live(); });
   on('oIColor', 'change', commit);
   on('oIOp', 'input', e => { o.op = clamp(+e.target.value, 0.05, 1); live(); });
@@ -2040,15 +2095,9 @@ function renderPanel() {
     const r = b.dataset.coter === 'l' ? dl : dv;
     if (!r || r.d < 1e-6) return;
     const c = pushObj({ type: 'cote', a: r.pa, b: r.pb });
-    selId = c.id; afterChange();
+    setSel(c.id); afterChange();
   }));
-  on('oDup', 'click', () => {
-    const c = JSON.parse(JSON.stringify(o)); c.id = S.nextId++;
-    const off = isElev(S.mode) ? 0 : -1, dx = famOf(S.mode) === 'insertion' ? 10 : 1;
-    if (c.pts) c.pts = c.pts.map(p => [p[0] + dx, p[1] + off]);
-    else if (c.p) c.p = [c.p[0] + dx, c.p[1] + off];
-    S.objs.push(c); selId = c.id; afterChange();
-  });
+  on('oDup', 'click', duplicateSelected);
   on('oDel', 'click', () => deleteSelected());
 }
 function setEdgeLength(o, i, L) {
@@ -2066,8 +2115,18 @@ function rotate(o, degCW) {
   }
 }
 function deleteSelected() {
-  if (selId === null) return;
-  S.objs = S.objs.filter(o => o.id !== selId); selId = null; afterChange();
+  const ids = selIds();
+  if (!ids.length) return;
+  S.objs = S.objs.filter(o => !ids.includes(o.id)); setSel(null); afterChange();
+}
+function duplicateSelected() {
+  const off = isElev(S.mode) ? 0 : -1, dx = famOf(S.mode) === 'insertion' ? 10 : 1, ids = [];
+  for (const o of selAll()) {
+    const c = JSON.parse(JSON.stringify(o)); c.id = S.nextId++;
+    for (const q of getPts(c)) { q[0] += dx; q[1] += off; }
+    S.objs.push(c); ids.push(c.id);
+  }
+  setSelMany(ids); afterChange();
 }
 
 /* ================================================================
@@ -2184,7 +2243,7 @@ function facadesFromPlan(src, P) {
     });
     S.scale = L0.sc;
     const b2 = bboxWorld(); if (b2) centerOn((b2.minx + b2.maxx) / 2, (b2.miny + b2.maxy) / 2);
-    selId = null;
+    setSel(null);
   });
   return list.length;
 }
@@ -2242,7 +2301,7 @@ function renderWiz() {
       const [x, y] = snapC(w, l), h = ep / 2;
       const pc = pushObj({ type: 'piece', name: $('wnName').value.trim().slice(0, 40), pts: rectPts(x, y, x + w, y + l) });
       if ($('wnWalls').checked) pushObj({ type: 'mur_n', name: '', pts: [[x - h, y - h], [x + w + h, y - h], [x + w + h, y + l + h], [x - h, y + l + h], [x - h, y - h]], ep });
-      selId = pc.id; afterChange();
+      setSel(pc.id); afterChange();
       toast('Pièce ajoutée. Ajoutez fenêtres et portes avec « Fenêtre (sur mur) » / « Porte (sur mur) » puis un clic sur le mur.');
     });
   } else if (fam === 'facade') {
@@ -2272,7 +2331,7 @@ function renderWiz() {
       if (!(w > 0 && he > 0 && hf > 0)) { toast('Saisissez des dimensions positives.'); return; }
       const r = bodyRight(), x0 = r === null ? Math.round((c[0] - w / 2) * 2) / 2 : Math.round((r + 4) * 2) / 2;
       const made = genFacade({ w, he, hf, shape: $('wfShape').value, mur: $('wfMur').value, toit: $('wfToit').value, name: $('wfName').value.trim(), levels: $('wfLev').checked, retrait: clamp(val('wfRetr', 3), 0.1, w / 2 - 0.05) }, x0);
-      selId = made.length ? made[0].id : null;
+      setSel(made.length ? made[0].id : null);
       afterChange();
       toast('Façade ajoutée. Ajoutez maintenant fenêtres et portes avec l’outil Rectangle (un simple clic).');
     });
@@ -2300,7 +2359,7 @@ function renderWiz() {
       const L = val('wcL', 0);
       if (!(L > 0)) { toast('Saisissez une longueur positive.'); return; }
       const o = pushObj({ type: 'tn', name: 'Terrain naturel', pts: [[0, val('wcZ1', 0) - S.z0], [L, val('wcZ2', 0) - S.z0]] });
-      selId = o.id; afterChange();
+      setSel(o.id); afterChange();
     });
     $('wcAdd').addEventListener('click', () => {
       const w = val('wcW', 0), he = val('wcHe', 0), hf = val('wcHf', 0);
@@ -2309,7 +2368,7 @@ function renderWiz() {
       let x0 = Math.round((c[0] - w / 2) * 2) / 2;
       if (t) { const bb = bboxOf(t.pts); x0 = Math.round(((bb.x0 + bb.x1) / 2 - w / 2) * 2) / 2; }
       const made = genCoupe({ w, he, hf, zf: val('wcZf', 0) - S.z0, levels: $('wcLev').checked }, x0);
-      selId = made.length ? made[0].id : null;
+      setSel(made.length ? made[0].id : null);
       afterChange();
     });
   }
@@ -2445,7 +2504,7 @@ function markExported(id) {
 }
 function useState(st, pid) {
   S = st; curPid = pid; lastEdit = 0; lsSet(KEY + '-cur', pid);
-  selId = null; view.auto = true; ui.calib = null; ui.draw = null;
+  setSel(null); view.auto = true; ui.calib = null; ui.draw = null;
   if (!Number.isFinite(S.ox)) { const c = DEF_CENTER[S.mode]; centerOn(c[0], c[1]); }
   for (const m of Object.keys(S.docs)) if (!Number.isFinite(S.docs[m].ox)) S.docs[m].ox = undefined;
   loadStoredImages();
@@ -2615,6 +2674,38 @@ function placeOnWall(type, hit) {
   addPoly(type, [A, B], hit.o.ep ? { ep: hit.o.ep } : null);
   return true;
 }
+// Déplacement d'une fenêtre ou d'une porte : elle glisse le long du mur le plus proche,
+// passe d'un mur à l'autre, et se déplace librement loin de tout mur (pas d'aimantation à la grille).
+function hostKey(o) {
+  const a = o.pts[0], b = o.pts[1], h = wallHit([(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], 0.05);
+  return h ? h.o.id + ':' + h.i : null;
+}
+function slideOpening(d, w) {
+  const o = d.o, A0 = d.orig[0][0], B0 = d.orig[0][1], W = dist(A0, B0);
+  const target = [(A0[0] + B0[0]) / 2 + w[0] - d.start[0], (A0[1] + B0[1]) / 2 + w[1] - d.start[1]];
+  const hit = W > 1e-9 ? wallHit(target, 20 / view.k / K()) : null, L = hit ? dist(hit.a, hit.b) : 0;
+  if (hit && L >= 0.1) {
+    let ux = (hit.b[0] - hit.a[0]) / L, uy = (hit.b[1] - hit.a[1]) / L;
+    const wd = Math.min(W, L);
+    let t = (target[0] - hit.a[0]) * ux + (target[1] - hit.a[1]) * uy;
+    if (S.snap > 0 && !ui.free) t = Math.round(t / 0.05) * 0.05;          // position au centimètre près (pas de 5 cm)
+    t = clamp(t, wd / 2, L - wd / 2);
+    const c = [hit.a[0] + ux * t, hit.a[1] + uy * t];
+    if (ux * (B0[0] - A0[0]) + uy * (B0[1] - A0[1]) < 0) { ux = -ux; uy = -uy; }   // garde le sens d'origine (charnière)
+    o.pts = [[c[0] - ux * wd / 2, c[1] - uy * wd / 2], [c[0] + ux * wd / 2, c[1] + uy * wd / 2]];
+    if (hit.o.ep) o.ep = hit.o.ep;
+    d.host = hit.o.id + ':' + hit.i;
+    return;
+  }
+  const dx = Math.round((w[0] - d.start[0]) * 100) / 100, dy = Math.round((w[1] - d.start[1]) * 100) / 100;   // au centimètre
+  o.pts = [[A0[0] + dx, A0[1] + dy], [B0[0] + dx, B0[1] + dy]];
+  d.host = null;
+}
+// emprise d'un objet (pour la sélection par rectangle)
+function objBox(o) {
+  if (o.type === 'sym') return primsBBox(symPrims(o));
+  return bboxOf(getPts(o));
+}
 function snapPoint(w, from, exclude, onWall) {
   let p = [w[0], w[1]], lockX = false, lockY = false;
   if (from && (S.ortho || ui.shift)) {
@@ -2629,7 +2720,7 @@ function snapPoint(w, from, exclude, onWall) {
   for (const q of cands) { const d = dist(p, q); if (d < bd) { bd = d; best = q; } }
   if (best) return { p: [best[0], best[1]], kind: 'vertex' };
   if (onWall) { const h = wallHit(p, tol); if (h) return { p: h.q, kind: 'wall' }; }
-  if (S.snap > 0) {
+  if (S.snap > 0 && !ui.free) {
     const g = S.snap;
     if (!lockX) p[0] = Math.round(p[0] / g) * g;
     if (!lockY) p[1] = Math.round(p[1] / g) * g;
@@ -2637,8 +2728,13 @@ function snapPoint(w, from, exclude, onWall) {
   return { p, kind: 'grid' };
 }
 function handleAt(o, pp) {
-  const pts = getPts(o);
-  for (let i = 0; i < pts.length; i++) { const q = toP(pts[i]); if (Math.hypot(q[0] - pp[0], q[1] - pp[1]) * view.k < (ui.touchMode ? 16 : 9)) return i; }
+  const P = getPts(o).map(toP), base = ui.touchMode ? 16 : 9;
+  for (let i = 0; i < P.length; i++) {
+    // petits objets (fenêtre, porte…) : poignées réduites pour pouvoir saisir l'objet par son milieu
+    let near = Infinity;
+    for (let j = 0; j < P.length; j++) if (j !== i) near = Math.min(near, Math.hypot(P[j][0] - P[i][0], P[j][1] - P[i][1]) * view.k);
+    if (Math.hypot(P[i][0] - pp[0], P[i][1] - pp[1]) * view.k < Math.min(base, Math.max(3, near * 0.3))) return i;
+  }
   return -1;
 }
 function hitObject(pp) {
@@ -2669,7 +2765,7 @@ function addPoly(type, pts, extra) {
   if (TYPES[type].mat) o.mat = TYPES[type].defMat;
   if (type === 'portail') o.style = 'battant';
   if (type === 'porte_p') { o.hinge = 'a'; o.flip = false; autoSwing(o); }
-  selId = o.id; setTool('select'); afterChange();
+  setSel(o.id); setTool('select'); afterChange();
 }
 function finishPoly() {
   if (!ui.draw) return;
@@ -2695,29 +2791,44 @@ function startPan(e) {
   ui.pan = { sx: e.clientX, sy: e.clientY, tx: view.tx, ty: view.ty };
   view.auto = false; updateCursor();
 }
-function createPoint(spec, p) { const o = pushObj(Object.assign({ p }, spec)); selId = o.id; setTool('select'); afterChange(); return o; }
+function createPoint(spec, p) { const o = pushObj(Object.assign({ p }, spec)); setSel(o.id); setTool('select'); afterChange(); return o; }
 
 function handleDown(e) {
   if (e.button === 2) return;
   try { stage.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
-  ui.shift = e.shiftKey;
+  ui.shift = e.shiftKey; ui.free = !!e.altKey;
   if (e.button === 1 || ui.space || tool === 'hand') { startPan(e); e.preventDefault(); return; }
   const pp = evPaper(e), w = toW(pp);
   if (tool === 'select') {
+    const add = !!(e.shiftKey || e.ctrlKey || e.metaKey), multi = selMany.length > 1;
     const o = sel();
-    if (o) {
+    if (o && !multi && !add) {
       const idx = handleAt(o, pp);
-      if (idx >= 0) { ui.drag = { kind: 'vertex', o, idx }; return; }
+      if (idx >= 0) {
+        ui.drag = { kind: 'vertex', o, idx };
+        if (isWallOpening(o.type) && o.pts.length === 2) {   // extrémité d'une ouverture : elle s'allonge le long du mur
+          const a = o.pts[1 - idx], b = o.pts[idx], L = dist(a, b);
+          if (L > 1e-9) ui.drag.dir = [(b[0] - a[0]) / L, (b[1] - a[1]) / L];
+        }
+        return;
+      }
     }
     const h = hitObject(pp);
     if (h) {
-      selId = h.id;
-      ui.drag = { kind: 'move', o: h, start: w, orig: getPts(h).map(p => [p[0], p[1]]) };
+      let reduceTo = null;
+      if (add) { toggleSel(h.id); if (!isSelected(h.id)) { renderPanel(); render(); return; } }
+      else if (!isSelected(h.id)) setSel(h.id);
+      else if (multi) reduceTo = h.id;                     // simple clic sur un élément d'une sélection multiple : ne garder que lui
+      const objs = selAll();
+      ui.drag = { kind: 'move', o: h, objs, start: w, orig: objs.map(x => getPts(x).map(p => [p[0], p[1]])), reduceTo,
+        slide: objs.length === 1 && isWallOpening(h.type) && h.pts.length === 2 };
+      if (ui.drag.slide) { ui.drag.orig = [h.pts.map(p => [p[0], p[1]])]; ui.drag.host0 = hostKey(h); }
       renderPanel(); render();
       return;
     }
-    if (selId !== null) { selId = null; renderPanel(); render(); }
-    startPan(e);
+    // clic dans le vide : rectangle de sélection (Maj : ajoute à la sélection)
+    ui.marq = { a: w, b: null, base: add ? selIds() : [], sx: e.clientX, sy: e.clientY };
+    if (!add && selIds().length) { setSel(null); renderPanel(); render(); }
   } else if (tool === 'bgmove') {
     if (S.bg) ui.drag = { kind: 'bg', start: w, orig: [S.bg.cx, S.bg.cy] };
   } else if (tool === 'calib') {
@@ -2746,7 +2857,7 @@ function handleDown(e) {
     if (!ui.coteA) ui.coteA = p;
     else if (dist(p, ui.coteA) > 1e-6) {
       const c = pushObj({ type: 'cote', a: ui.coteA, b: p });
-      ui.coteA = null; ui.hover = null; selId = c.id; setTool('select'); afterChange();
+      ui.coteA = null; ui.hover = null; setSel(c.id); setTool('select'); afterChange();
     }
     renderOverlay();
   } else if (tool === 'niveau') {
@@ -2765,7 +2876,7 @@ function handleDown(e) {
 const touches = new Map(); let gest = null, tapPending = null;
 const TAP_TOOLS = ['poly', 'cote', 'niveau', 'texte', 'sym', 'calib'];
 function cancelGestures() {
-  tapPending = null; ui.pan = null; ui.rect = null;
+  tapPending = null; ui.pan = null; ui.rect = null; ui.marq = null;
   if (ui.drag) { ui.drag = null; if (undoStack.length) restore(undoStack[undoStack.length - 1]); }
   renderOverlay();
 }
@@ -2814,20 +2925,36 @@ stage.addEventListener('pointermove', e => {
   const pp = evPaper(e), w = toW(pp);
   const el0 = isElev(S.mode), u = famOf(S.mode) === 'insertion' ? 'mm' : 'm';
   $('coords').textContent = `x ${f2(w[0])} ${u} · ${el0 ? 'alt.' : 'y'} ${f2(el0 ? w[1] + S.z0 : w[1])} ${u} · ${famOf(S.mode) === 'insertion' ? 'sans échelle' : 'échelle 1/' + S.scale}`;
+  if (ui.marq) { ui.marq.b = w; renderOverlay(); return; }
   if (ui.drag) {
     const d = ui.drag;
+    ui.free = !!e.altKey;
     if (d.kind === 'vertex') {
-      const pt = getPts(d.o)[d.idx], p = snapPoint(w, null, pt, isWallOpening(d.o.type)).p;
-      pt[0] = p[0]; pt[1] = p[1];
+      const pt = getPts(d.o)[d.idx];
+      if (d.dir) {                                         // ouverture : largeur réglée le long du mur, au pas de 5 cm
+        const a = d.o.pts[1 - d.idx];
+        let t = (w[0] - a[0]) * d.dir[0] + (w[1] - a[1]) * d.dir[1];
+        if (S.snap > 0 && !ui.free) t = Math.round(t / 0.05) * 0.05;
+        t = Math.max(0.3, t);
+        pt[0] = a[0] + d.dir[0] * t; pt[1] = a[1] + d.dir[1] * t;
+      } else {
+        const p = snapPoint(w, null, pt, false).p;
+        pt[0] = p[0]; pt[1] = p[1];
+      }
     } else if (d.kind === 'bg') {
       S.bg.cx = d.orig[0] + (w[0] - d.start[0]); S.bg.cy = d.orig[1] + (w[1] - d.start[1]);
     } else {
       let dx = w[0] - d.start[0], dy = w[1] - d.start[1];
-      if (S.snap > 0) {
-        const g = S.snap, t0 = [d.orig[0][0] + dx, d.orig[0][1] + dy];
-        dx = Math.round(t0[0] / g) * g - d.orig[0][0]; dy = Math.round(t0[1] / g) * g - d.orig[0][1];
+      if (!d.moved && Math.hypot(dx, dy) * K() * view.k < 3) return;     // petit tremblement du clic : pas de déplacement
+      d.moved = true;
+      if (d.slide) slideOpening(d, w);
+      else {
+        if (S.snap > 0 && !ui.free) {
+          const g = S.snap, o0 = d.orig[0][0], t0 = [o0[0] + dx, o0[1] + dy];
+          dx = Math.round(t0[0] / g) * g - o0[0]; dy = Math.round(t0[1] / g) * g - o0[1];
+        } else { dx = Math.round(dx * 100) / 100; dy = Math.round(dy * 100) / 100; }
+        d.objs.forEach((o, k) => getPts(o).forEach((pt, i) => { pt[0] = d.orig[k][i][0] + dx; pt[1] = d.orig[k][i][1] + dy; }));
       }
-      getPts(d.o).forEach((pt, i) => { pt[0] = d.orig[i][0] + dx; pt[1] = d.orig[i][1] + dy; });
     }
     if (d.kind === 'bg') { updateBg(); renderOverlay(); }
     else if (lastRenderMs > 40) { d.ghost = true; renderOverlay(); }   // dessin lourd : aperçu dans la surcouche, rendu complet au relâcher
@@ -2843,9 +2970,24 @@ stage.addEventListener('pointermove', e => {
   }
 });
 
-function endPointer() {
+function endPointer(e) {
   if (ui.pan) { ui.pan = null; updateCursor(); }
-  if (ui.drag) { ui.drag = null; commit(); renderPanel(); renderBg(); render(); }
+  if (ui.marq) {
+    const m = ui.marq; ui.marq = null;
+    const big = e && Math.hypot((e.clientX || 0) - m.sx, (e.clientY || 0) - m.sy) > 4;
+    if (m.b && big) {
+      const x0 = Math.min(m.a[0], m.b[0]), x1 = Math.max(m.a[0], m.b[0]), y0 = Math.min(m.a[1], m.b[1]), y1 = Math.max(m.a[1], m.b[1]);
+      const ids = S.objs.filter(o => { const b = objBox(o); return b.x0 >= x0 && b.x1 <= x1 && b.y0 >= y0 && b.y1 <= y1; }).map(o => o.id);
+      setSelMany(m.base.concat(ids));
+    }
+    renderPanel(); render();
+  }
+  if (ui.drag) {
+    const d = ui.drag; ui.drag = null;
+    if (d.kind === 'move' && !d.moved && d.reduceTo !== null && d.reduceTo !== undefined) setSel(d.reduceTo);
+    if (d.slide && d.moved && d.host && d.host !== d.host0 && d.o.type === 'porte_p') autoSwing(d.o);   // nouveau mur : battant vers l'intérieur
+    commit(); renderPanel(); renderBg(); render();
+  }
   if (ui.rect) {
     const r = ui.rect; ui.rect = null;
     const T = TYPES[curType];
@@ -2869,7 +3011,7 @@ function onPointerEnd(e) {
       return;
     }
   }
-  endPointer();
+  endPointer(e);
 }
 stage.addEventListener('pointerup', onPointerEnd);
 stage.addEventListener('pointercancel', onPointerEnd);
@@ -2907,12 +3049,17 @@ window.addEventListener('keydown', e => {
   if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? doRedo() : doUndo(); return; }
   if (mod && e.key.toLowerCase() === 'y') { e.preventDefault(); doRedo(); return; }
   if (mod && e.key.toLowerCase() === 'c') { if (selId !== null) { e.preventDefault(); copySel(); } return; }
+  if (mod && e.key.toLowerCase() === 'a') {
+    e.preventDefault(); setTool('select'); setSelMany(S.objs.map(o => o.id)); renderPanel(); render();
+    if (S.objs.length) toast(`${S.objs.length} élément(s) sélectionné(s).`);
+    return;
+  }
   if (mod && e.key.toLowerCase() === 'v') { if (clip) { e.preventDefault(); pasteClip(); } return; }
   if (mod) return;
   if (e.key === 'Escape') {
     if (ui.draw || ui.rect || ui.coteA || (ui.calib && (ui.calib.a || ui.calib.b))) { const t = tool; setTool(t); if (t === 'calib') { ui.calib = { a: null, b: null }; renderBg(); } }
     else if (tool !== 'select') setTool('select');
-    else { selId = null; renderPanel(); render(); }
+    else { setSel(null); renderPanel(); render(); }
     return;
   }
   if (e.key === 'Enter' && ui.draw) { finishPoly(); return; }
@@ -2922,10 +3069,16 @@ window.addEventListener('keydown', e => {
   if ((e.key === 'Delete' || e.key === 'Backspace') && selId !== null && !ui.draw) { e.preventDefault(); deleteSelected(); return; }
   if (e.key.startsWith('Arrow') && selId !== null && tool === 'select') {
     e.preventDefault();
-    const step = (S.snap > 0 ? S.snap : 0.1) * (e.shiftKey ? 10 : 1);
-    const dx = e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0;
-    const dy = e.key === 'ArrowDown' ? -step : e.key === 'ArrowUp' ? step : 0;
-    for (const p of getPts(sel())) { p[0] += dx; p[1] += dy; }
+    const objs = selAll(), o = objs[0], wallOp = objs.length === 1 && isWallOpening(o.type) && o.pts.length === 2 && hostKey(o);
+    const step = (wallOp ? 0.05 : S.snap > 0 ? S.snap : 0.1) * (e.shiftKey ? 10 : 1);
+    let dx = e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0;
+    let dy = e.key === 'ArrowDown' ? -step : e.key === 'ArrowUp' ? step : 0;
+    if (wallOp) {                                    // fenêtre ou porte posée sur un mur : elle glisse le long du mur
+      const a = o.pts[0], b = o.pts[1], L = dist(a, b), ux = (b[0] - a[0]) / L, uy = (b[1] - a[1]) / L, t = dx * ux + dy * uy;
+      if (Math.abs(t) < step * 0.3) return;
+      const k = Math.sign(t) * step; dx = ux * k; dy = uy * k;
+    }
+    for (const x of objs) for (const p of getPts(x)) { p[0] += dx; p[1] += dy; }
     afterChange(); return;
   }
   const map = { v: 'select', h: 'hand', p: 'poly', r: 'rect', c: 'cote', t: 'texte', n: 'niveau', s: 'sym' };
@@ -2943,21 +3096,22 @@ window.addEventListener('keyup', e => {
 /* ---------- Copier / coller ---------- */
 let clip = null;
 function copySel() {
-  const o = sel();
-  if (!o) { toast('Sélectionnez d’abord un objet à copier.'); return false; }
-  clip = { mode: S.mode, o: JSON.parse(JSON.stringify(o)), n: 0 };
-  toast('Copié. « Coller » (Ctrl+V) le place ici, ou dans une autre vue.');
+  const objs = selAll();
+  if (!objs.length) { toast('Sélectionnez d’abord un objet à copier.'); return false; }
+  clip = { mode: S.mode, objs: JSON.parse(JSON.stringify(objs)), n: 0 };
+  toast((objs.length > 1 ? objs.length + ' éléments copiés' : 'Copié') + '. « Coller » (Ctrl+V) les place ici, ou dans une autre vue.');
   return true;
 }
 function pasteClip() {
   if (!clip) { toast('Rien à coller : copiez d’abord un objet.'); return; }
   const ins = m => famOf(m) === 'insertion';
   if (ins(clip.mode) !== ins(S.mode)) { toast('Impossible de coller entre l’insertion (photo, en mm) et un plan à l’échelle.'); return; }
-  const st = { nextId: S.nextId }, d = sanitizeDoc({ objs: [clip.o], scale: S.scale }, S.mode, st);
+  const st = { nextId: S.nextId }, d = sanitizeDoc({ objs: clip.objs, scale: S.scale }, S.mode, st);
   if (!d.objs.length) { toast('Ce type d’objet n’existe pas dans cette vue.'); return; }
-  const o = d.objs[0], step = ins(S.mode) ? 20 : Math.max(0.5, S.snap || 0), off = clip.mode === S.mode ? step * (++clip.n) : 0;
-  for (const q of getPts(o)) { q[0] += off; q[1] -= off; }
-  S.nextId = st.nextId; S.objs.push(o); selId = o.id; setTool('select'); afterChange();
+  const step = ins(S.mode) ? 20 : Math.max(0.5, S.snap || 0), off = clip.mode === S.mode ? step * (++clip.n) : 0;
+  for (const o of d.objs) for (const q of getPts(o)) { q[0] += off; q[1] -= off; }
+  S.nextId = st.nextId; S.objs.push(...d.objs); setSelMany(d.objs.map(o => o.id)); setTool('select'); afterChange();
+  if (d.objs.length < clip.objs.length) toast(`${clip.objs.length - d.objs.length} élément(s) non collé(s) : ce type n’existe pas dans cette vue.`);
 }
 
 /* ---------- Import DXF (ASCII : LINE, LWPOLYLINE, POLYLINE, CIRCLE, ARC, TEXT, MTEXT, DIMENSION) ---------- */
@@ -3105,7 +3259,7 @@ function applyDXF(P, o) {
   if (!d.objs.length) { toast('Rien d’exploitable dans ce fichier pour cette vue.'); return; }
   S.nextId = st.nextId; S.objs.push(...d.objs);
   if (wasEmpty) bestScale();
-  selId = null; setTool('select'); syncSettings(); fitView(); afterChange();
+  setSel(null); setTool('select'); syncSettings(); fitView(); afterChange();
   toast(`${d.objs.length} élément(s) importé(s)${far ? ' (dessin recentré : coordonnées très éloignées de l’origine)' : ''}. Vérifiez l’échelle et les types, puis ajustez.`);
 }
 function openDXFImport(P, fname) {
@@ -3211,7 +3365,7 @@ function switchMode(m) {
   stashActive(); loadDoc(m);
   $('coords').textContent = '';
   if (LV.includes(m)) lastLv = m;
-  selId = null; ui.calib = null;
+  setSel(null); ui.calib = null;
   curType = DEF_TYPE[m];
   syncSettings(); afterChange();
 }
@@ -3732,7 +3886,7 @@ const TOUR = [
   ['#cardHelp', '3. L’aide de chaque pièce', '<p>Ce cadre explique ce que la mairie attend dans la pièce affichée. Lisez-le avant de dessiner.</p>'],
   ['.tools', '4. Dessiner', '<p>Choisissez <b>ce que vous dessinez</b> dans la liste (construction, clôture, mur…), puis l’outil <b>Rectangle</b> (glisser) ou <b>Polygone</b> (un clic par sommet, double-clic pour finir).</p><p>Fenêtres et portes : choisissez-les dans la liste puis cliquez sur un mur. <b>Copier / Coller</b> reprend un élément, même d’un niveau à l’autre.</p><p>Sur tablette : deux doigts pour zoomer.</p>'],
   ['#cardWiz', '5. L’assistant', '<p>Pour aller vite et juste : saisissez les <b>dimensions exactes</b> d’un bâtiment ou d’une pièce.</p><p>Sur le plan de masse, il crée aussi <b>les 4 façades</b> de votre construction, avec ses fenêtres.</p>'],
-  ['#cardSel', '6. Modifier un élément', '<p>Cliquez sur un élément du dessin (outil Sélection) : ici, vous réglez son nom, ses <b>longueurs au centimètre</b>, son matériau… <kbd>Suppr</kbd> l’efface, <kbd>Ctrl+Z</kbd> annule.</p>'],
+  ['#cardSel', '6. Modifier un élément', '<p>Cliquez sur un élément du dessin (outil Sélection) : ici, vous réglez son nom, ses <b>longueurs au centimètre</b>, sa couleur, son matériau… <kbd>Suppr</kbd> l’efface, <kbd>Ctrl+Z</kbd> annule.</p><p>Pour déplacer plusieurs éléments ensemble, <b>glissez un rectangle dans le vide</b> autour d’eux (ou <kbd>Maj</kbd> + clic).</p>'],
   ['#cardSheet', '7. Feuille et échelle', '<p>Format A4 ou A3, orientation, échelle. <b>Meilleure échelle</b> choisit la plus grande échelle où tout tient. Réglez le <b>nord</b> sur le plan de masse.</p>'],
   ['#cardCart', '8. Le cartouche', '<p>Votre nom, l’adresse, la parcelle : ces informations apparaissent en bas de chaque plan. Le champ <b>Projet</b> sert aussi de nom à votre dossier.</p>'],
   ['#bPDF', '9. Exporter', '<p><b>Exporter PDF</b> imprime la vue affichée : choisissez « Enregistrer au format PDF », marges <b>Aucune</b>, échelle <b>100 %</b> pour respecter l’échelle.</p><p>Pour le dossier complet (page de garde + tous les plans), passez par « Mon dossier ».</p>'],

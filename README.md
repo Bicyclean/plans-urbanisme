@@ -32,6 +32,9 @@ Chaque vue a un texte d’aide en français expliquant ce que le service instruc
 
 - Dessin en **mètres réels**, feuille **A4 ou A3**, portrait ou paysage, échelle choisie ou automatique, légende, barre d’échelle, nord, cartouche.
 - Murs avec épaisseur, ouvertures posées d’un clic sur un mur, cotes libres, symboles (arbres, voitures, personnes, repères).
+- **Fenêtres et portes** : elles glissent le long du mur quand on les déplace (au pas de 5 cm) et passent d’un mur à l’autre ; loin de tout mur, elles se déplacent librement. `Alt` en glissant désactive l’aimantation à la grille pour tous les objets.
+- **Sélection multiple** : rectangle de sélection en glissant dans le vide, `Maj` + clic, `Ctrl+A` ; déplacer, décaler aux flèches, dupliquer, copier ou supprimer plusieurs éléments à la fois.
+- **Couleur des constructions existantes** au choix, pour les distinguer (la légende suit).
 - **Image de fond** (cadastre, photo, plan existant) avec mise à l’échelle par deux points.
 - **Copier / coller** (Ctrl+C, Ctrl+V ou boutons), y compris d’une vue à l’autre quand le type d’objet existe dans les deux (ex. un mur d’un niveau à l’autre).
 - **Tactile** : un doigt pour dessiner ou déplacer, deux doigts pour zoomer et déplacer la vue, barre « Terminer / Dernier point / Abandonner » pour les tracés.
